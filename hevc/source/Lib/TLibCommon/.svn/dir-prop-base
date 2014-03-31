@@ -1,0 +1,10 @@
+K 10
+svn:ignore
+V 101
+TypeDef.h.orig
+TComDataCU.cpp.orig
+TComLoopFilter.cpp.orig
+ContextTables.h.orig
+TComTrQuant.cpp.orig
+
+END

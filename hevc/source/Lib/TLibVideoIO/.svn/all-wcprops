@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibVideoIO
+END
+TVideoIOYuv.h
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibVideoIO/TVideoIOYuv.h
+END
+TVideoIOYuv.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibVideoIO/TVideoIOYuv.cpp
+END

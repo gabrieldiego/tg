@@ -1,0 +1,323 @@
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/svn_HEVCSoftware/!svn/ver/3800/trunk/source/Lib/TLibCommon
+END
+ContextModel.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/ContextModel.cpp
+END
+TypeDef.h
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TypeDef.h
+END
+TComCABACTables.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComCABACTables.cpp
+END
+TComPicYuv.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComPicYuv.h
+END
+TComMotionInfo.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComMotionInfo.h
+END
+TComMv.h
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComMv.h
+END
+TComYuv.h
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComYuv.h
+END
+CommonDef.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/svn_HEVCSoftware/!svn/ver/3800/trunk/source/Lib/TLibCommon/CommonDef.h
+END
+TComRdCostWeightPrediction.h
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComRdCostWeightPrediction.h
+END
+SEI.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/SEI.cpp
+END
+TComRom.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComRom.cpp
+END
+TComRdCost.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComRdCost.cpp
+END
+TComBitStream.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComBitStream.h
+END
+TComSlice.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComSlice.cpp
+END
+TComInterpolationFilter.h
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComInterpolationFilter.h
+END
+ContextModel3DBuffer.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/ContextModel3DBuffer.cpp
+END
+TComTrQuant.h
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComTrQuant.h
+END
+TComPicSym.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComPicSym.cpp
+END
+TComPrediction.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComPrediction.h
+END
+TComDataCU.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComDataCU.h
+END
+TComWeightPrediction.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComWeightPrediction.cpp
+END
+TComSampleAdaptiveOffset.h
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComSampleAdaptiveOffset.h
+END
+TComPicYuv.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComPicYuv.cpp
+END
+TComPic.h
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComPic.h
+END
+TComList.h
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComList.h
+END
+TComMotionInfo.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComMotionInfo.cpp
+END
+TComPattern.h
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComPattern.h
+END
+TComYuv.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComYuv.cpp
+END
+TComBitCounter.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComBitCounter.h
+END
+AccessUnit.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/AccessUnit.h
+END
+TComLoopFilter.h
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComLoopFilter.h
+END
+TComPicYuvMD5.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComPicYuvMD5.cpp
+END
+ContextModel.h
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/ContextModel.h
+END
+TComRdCostWeightPrediction.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComRdCostWeightPrediction.cpp
+END
+TComCABACTables.h
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComCABACTables.h
+END
+TComBitStream.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComBitStream.cpp
+END
+NAL.h
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/NAL.h
+END
+TComInterpolationFilter.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComInterpolationFilter.cpp
+END
+TComTrQuant.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComTrQuant.cpp
+END
+TComPrediction.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComPrediction.cpp
+END
+TComDataCU.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComDataCU.cpp
+END
+ContextTables.h
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/ContextTables.h
+END
+SEI.h
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/SEI.h
+END
+TComRom.h
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComRom.h
+END
+TComRdCost.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComRdCost.h
+END
+TComSlice.h
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComSlice.h
+END
+TComSampleAdaptiveOffset.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComSampleAdaptiveOffset.cpp
+END
+ContextModel3DBuffer.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/ContextModel3DBuffer.h
+END
+TComPicSym.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComPicSym.h
+END
+TComPic.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComPic.cpp
+END
+TComWeightPrediction.h
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComWeightPrediction.h
+END
+TComPattern.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComPattern.cpp
+END
+TComLoopFilter.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/svn_HEVCSoftware/!svn/ver/3798/trunk/source/Lib/TLibCommon/TComLoopFilter.cpp
+END

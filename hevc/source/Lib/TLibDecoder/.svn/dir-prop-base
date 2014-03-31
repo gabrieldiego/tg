@@ -1,0 +1,10 @@
+K 10
+svn:ignore
+V 87
+TDecTop.cpp.orig
+TDecCAVLC.cpp.orig
+TDecCAVLC.h.orig
+TDecSbac.cpp.orig
+TDecSbac.h.orig
+
+END

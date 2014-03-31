@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/svn/svn_HEVCSoftware/!svn/ver/3791/trunk/cfg
+END
+encoder_intra_main.cfg
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/svn_HEVCSoftware/!svn/ver/3791/trunk/cfg/encoder_intra_main.cfg
+END
+encoder_intra_main10.cfg
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/svn_HEVCSoftware/!svn/ver/3791/trunk/cfg/encoder_intra_main10.cfg
+END
+encoder_lowdelay_P_main.cfg
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/svn_HEVCSoftware/!svn/ver/3791/trunk/cfg/encoder_lowdelay_P_main.cfg
+END
+encoder_lowdelay_P_main10.cfg
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/svn_HEVCSoftware/!svn/ver/3791/trunk/cfg/encoder_lowdelay_P_main10.cfg
+END
+encoder_lowdelay_main.cfg
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/svn_HEVCSoftware/!svn/ver/3791/trunk/cfg/encoder_lowdelay_main.cfg
+END
+encoder_lowdelay_main10.cfg
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/svn_HEVCSoftware/!svn/ver/3791/trunk/cfg/encoder_lowdelay_main10.cfg
+END
+encoder_randomaccess_main.cfg
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/svn_HEVCSoftware/!svn/ver/3791/trunk/cfg/encoder_randomaccess_main.cfg
+END
+encoder_randomaccess_main10.cfg
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/svn_HEVCSoftware/!svn/ver/3791/trunk/cfg/encoder_randomaccess_main10.cfg
+END

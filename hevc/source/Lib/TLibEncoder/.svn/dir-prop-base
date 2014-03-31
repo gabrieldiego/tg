@@ -1,0 +1,12 @@
+K 10
+svn:ignore
+V 126
+TEncTop.cpp.orig
+TEncCavlc.cpp.orig
+TEncCavlc.h.orig
+TEncEntropy.h.orig
+TEncSbac.cpp.orig
+TEncSbac.h.orig
+TEncSearch.cpp.orig
+
+END

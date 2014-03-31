@@ -1,0 +1,46 @@
+10
+
+dir
+3878
+https://hevc.hhi.fraunhofer.de/svn/svn_HEVCSoftware/trunk/source/Lib
+https://hevc.hhi.fraunhofer.de/svn/svn_HEVCSoftware
+
+
+
+2014-01-22T16:53:58.717981Z
+3800
+bossen
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ce97f6c2-8f86-0410-b44d-af84b13ec34f
+
+TLibVideoIO
+dir
+
+TLibEncoder
+dir
+
+libmd5
+dir
+
+TAppCommon
+dir
+
+TLibDecoder
+dir
+
+TLibCommon
+dir
+

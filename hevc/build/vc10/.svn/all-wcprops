@@ -1,0 +1,89 @@
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/svn_HEVCSoftware/!svn/ver/3348/trunk/build/vc10
+END
+TAppEncoder_vc10.vcxproj.filters
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/svn_HEVCSoftware/!svn/ver/3348/trunk/build/vc10/TAppEncoder_vc10.vcxproj.filters
+END
+TAppCommon_vc10.vcxproj
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/svn_HEVCSoftware/!svn/ver/3279/trunk/build/vc10/TAppCommon_vc10.vcxproj
+END
+TLibDecoder_vc10.vcxproj
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/svn_HEVCSoftware/!svn/ver/3279/trunk/build/vc10/TLibDecoder_vc10.vcxproj
+END
+TLibVideoIO_vc10.vcxproj.filters
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/svn_HEVCSoftware/!svn/ver/3348/trunk/build/vc10/TLibVideoIO_vc10.vcxproj.filters
+END
+TAppDecoder_vc10.vcxproj.filters
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/svn_HEVCSoftware/!svn/ver/3348/trunk/build/vc10/TAppDecoder_vc10.vcxproj.filters
+END
+TLibEncoder_vc10.vcxproj.filters
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/svn_HEVCSoftware/!svn/ver/3348/trunk/build/vc10/TLibEncoder_vc10.vcxproj.filters
+END
+TLibCommon_vc10.vcxproj
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/svn_HEVCSoftware/!svn/ver/3279/trunk/build/vc10/TLibCommon_vc10.vcxproj
+END
+TAppCommon_vc10.vcxproj.filters
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/svn_HEVCSoftware/!svn/ver/3348/trunk/build/vc10/TAppCommon_vc10.vcxproj.filters
+END
+TAppEncoder_vc10.vcxproj
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/svn_HEVCSoftware/!svn/ver/3279/trunk/build/vc10/TAppEncoder_vc10.vcxproj
+END
+TLibDecoder_vc10.vcxproj.filters
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/svn_HEVCSoftware/!svn/ver/3348/trunk/build/vc10/TLibDecoder_vc10.vcxproj.filters
+END
+TLibVideoIO_vc10.vcxproj
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/svn_HEVCSoftware/!svn/ver/3279/trunk/build/vc10/TLibVideoIO_vc10.vcxproj
+END
+TAppDecoder_vc10.vcxproj
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/svn_HEVCSoftware/!svn/ver/3279/trunk/build/vc10/TAppDecoder_vc10.vcxproj
+END
+TLibCommon_vc10.vcxproj.filters
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/svn_HEVCSoftware/!svn/ver/3348/trunk/build/vc10/TLibCommon_vc10.vcxproj.filters
+END
+TLibEncoder_vc10.vcxproj
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/svn_HEVCSoftware/!svn/ver/3279/trunk/build/vc10/TLibEncoder_vc10.vcxproj
+END
