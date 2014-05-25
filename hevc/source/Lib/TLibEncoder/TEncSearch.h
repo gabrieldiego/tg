@@ -435,6 +435,17 @@ protected:
                                    ,Bool biPred
                                    );
   
+  Void xPatternSearchFracDIF_hw   ( TComDataCU*   pcCU,
+                                    TComPattern*  pcPatternKey,
+                                    Pel*          piRefY,
+                                    Int           iRefStride,
+                                    TComMv*       pcMvInt,
+                                    TComMv&       rcMvHalf,
+                                    TComMv&       rcMvQter,
+                                    UInt&         ruiCost 
+                                   ,Bool biPred
+                                   );
+  
   Void xExtDIFUpSamplingH( TComPattern* pcPattern, Bool biPred  );
   Void xExtDIFUpSamplingQ( TComPattern* pcPatternKey, TComMv halfPelRef, Bool biPred );
   

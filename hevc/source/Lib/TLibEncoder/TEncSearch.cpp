@@ -41,6 +41,10 @@
 #include "TEncSearch.h"
 #include <math.h>
 
+#include <iostream>
+
+using namespace std;
+
 //! \ingroup TLibEncoder
 //! \{
 
@@ -4293,6 +4297,53 @@ Void TEncSearch::xTZSearch( TComDataCU* pcCU, TComPattern* pcPatternKey, Pel* pi
   // write out best match
   rcMv.set( cStruct.iBestX, cStruct.iBestY );
   ruiSAD = cStruct.uiBestSad - m_pcRdCost->getCost( cStruct.iBestX, cStruct.iBestY );
+}
+
+Void TEncSearch::xPatternSearchFracDIF_hw(TComDataCU* pcCU,
+                                       TComPattern* pcPatternKey,
+                                       Pel* piRefY,
+                                       Int iRefStride,
+                                       TComMv* pcMvInt,
+                                       TComMv& rcMvHalf,
+                                       TComMv& rcMvQter,
+                                       UInt& ruiCost
+                                       ,Bool biPred
+                                       )
+{
+  //  Reference pattern initialization (integer scale)
+  TComPattern cPatternRoi;
+  Int         iOffset    = pcMvInt->getHor() + pcMvInt->getVer() * iRefStride;
+  cPatternRoi.initPattern( piRefY +  iOffset,
+                          NULL,
+                          NULL,
+                          pcPatternKey->getROIYWidth(),
+                          pcPatternKey->getROIYHeight(),
+                          iRefStride,
+                          0, 0 );
+  
+  /* Print the contents of the CB */
+
+  /* Read the HW output results */
+
+  /* Compare to the SW results */
+
+  //  Half-pel refinement
+  xExtDIFUpSamplingH ( &cPatternRoi, biPred );
+  
+  rcMvHalf = *pcMvInt;   rcMvHalf <<= 1;    // for mv-cost
+  TComMv baseRefMv(0, 0);
+  ruiCost = xPatternRefinement( pcPatternKey, baseRefMv, 2, rcMvHalf   );
+  
+  m_pcRdCost->setCostScale( 0 );
+  
+  xExtDIFUpSamplingQ ( &cPatternRoi, rcMvHalf, biPred );
+  baseRefMv = rcMvHalf;
+  baseRefMv <<= 1;
+  
+  rcMvQter = *pcMvInt;   rcMvQter <<= 1;    // for mv-cost
+  rcMvQter += rcMvHalf;  rcMvQter <<= 1;
+  ruiCost = xPatternRefinement( pcPatternKey, baseRefMv, 1, rcMvQter );
+
 }
 
 Void TEncSearch::xPatternSearchFracDIF(TComDataCU* pcCU,

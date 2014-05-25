@@ -272,6 +272,70 @@ Void TComInterpolationFilter::filterHor(Int bitDepth, Pel *src, Int srcStride, S
   }
 }
 
+Void TComInterpolationFilter::filterHorLuma_hw(Int bitDepth, Pel *src, Int srcStride, Short *dst, Int dstStride, Int width, Int height, Bool isLast, Short const *coeff)
+{
+  if ( isLast )
+  {
+//    filter<NTAPS_LUMA, false, true, true>(bitDepth, src, srcStride, dst, dstStride, width, height, coeff);
+
+    Int row, col;
+  
+    Short c[8];
+    c[0] = coeff[0];
+    c[1] = coeff[1];
+    c[2] = coeff[2];
+    c[3] = coeff[3];
+    c[4] = coeff[4];
+    c[5] = coeff[5];
+    c[6] = coeff[6];
+    c[7] = coeff[7];
+  
+//    Int cStride = ( isVertical ) ? srcStride : 1;
+    Int cStride = 1;
+    src -= /*( N/2 - 1 ) */ 3 * cStride;
+
+    Int offset;
+    Short maxVal;
+//    Int headRoom = IF_INTERNAL_PREC - bitDepth;
+    Int shift = IF_FILTER_PREC;
+
+//    shift += (isFirst) ? 0 : headRoom;
+    offset = 1 << (shift - 1);
+//    offset += (isFirst) ? 0 : IF_INTERNAL_OFFS << IF_FILTER_PREC;
+    maxVal = (1 << bitDepth) - 1;
+  
+    for (row = 0; row < height; row++)
+    {
+      for (col = 0; col < width; col++)
+      {
+        Int sum;
+      
+        sum  = src[ col + 0 * cStride] * c[0];
+        sum += src[ col + 1 * cStride] * c[1];
+        sum += src[ col + 2 * cStride] * c[2];
+        sum += src[ col + 3 * cStride] * c[3];
+        sum += src[ col + 4 * cStride] * c[4];
+        sum += src[ col + 5 * cStride] * c[5];
+        sum += src[ col + 6 * cStride] * c[6];
+        sum += src[ col + 7 * cStride] * c[7];        
+      
+        Short val = ( sum + offset ) >> shift;
+        val = ( val < 0 ) ? 0 : val;
+        val = ( val > maxVal ) ? maxVal : val;        
+        dst[col] = val;
+      }
+    
+      src += srcStride;
+      dst += dstStride;
+    }    
+
+  }
+  else
+  {
+    filter<NTAPS_LUMA, false, true, false>(bitDepth, src, srcStride, dst, dstStride, width, height, coeff);
+  }
+}
+
 /**
  * \brief Filter a block of samples (vertical)
  *
@@ -334,7 +398,8 @@ Void TComInterpolationFilter::filterHorLuma(Pel *src, Int srcStride, Short *dst,
   }
   else
   {
-    filterHor<NTAPS_LUMA>(g_bitDepthY, src, srcStride, dst, dstStride, width, height, isLast, m_lumaFilter[frac]);
+//    filterHor<NTAPS_LUMA>(g_bitDepthY, src, srcStride, dst, dstStride, width, height, isLast, m_lumaFilter[frac]);
+    filterHorLuma_hw(g_bitDepthY, src, srcStride, dst, dstStride, width, height, isLast, m_lumaFilter[frac]);
   }
 }
 
