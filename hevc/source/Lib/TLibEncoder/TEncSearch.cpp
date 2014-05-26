@@ -42,6 +42,7 @@
 #include <math.h>
 
 #include <iostream>
+#include <iomanip>
 
 using namespace std;
 
@@ -4017,7 +4018,8 @@ Void TEncSearch::xMotionEstimation( TComDataCU* pcCU, TComYuv* pcYuvOrg, Int iPa
   m_pcRdCost->getMotionCost( 1, 0 );
   m_pcRdCost->setCostScale ( 1 );
   
-  xPatternSearchFracDIF( pcCU, pcPatternKey, piRefY, iRefStride, &rcMv, cMvHalf, cMvQter, ruiCost,bBi );
+//  xPatternSearchFracDIF( pcCU, pcPatternKey, piRefY, iRefStride, &rcMv, cMvHalf, cMvQter, ruiCost,bBi );
+  xPatternSearchFracDIF_hw( pcCU, pcPatternKey, piRefY, iRefStride, &rcMv, cMvHalf, cMvQter, ruiCost,bBi );
   
   m_pcRdCost->setCostScale( 0 );
   rcMv <<= 2;
@@ -4299,6 +4301,31 @@ Void TEncSearch::xTZSearch( TComDataCU* pcCU, TComPattern* pcPatternKey, Pel* pi
   ruiSAD = cStruct.uiBestSad - m_pcRdCost->getCost( cStruct.iBestX, cStruct.iBestY );
 }
 
+Void TEncSearch::DumpCUContents(TComPattern *pattern)
+{
+  Int width      = pattern->getROIYWidth();
+  Int height     = pattern->getROIYHeight();
+  Int srcStride  = pattern->getPatternLStride();
+  Int halfFilterSize = (NTAPS_LUMA>>1);
+  Int row, col;
+
+  Pel *src = pattern->getROIY() - halfFilterSize*srcStride - 1;
+
+  cout << "New Block. w:" << width << " stride: " << srcStride << endl;
+
+  for (row = 0; row < height; row++)
+  {
+    for (col = 0; col < width; col++)
+    {
+      cout << setw(3) << hex << src[col] << dec;
+    }
+
+    cout << endl;
+
+    src += srcStride;
+  }
+}
+
 Void TEncSearch::xPatternSearchFracDIF_hw(TComDataCU* pcCU,
                                        TComPattern* pcPatternKey,
                                        Pel* piRefY,
@@ -4329,7 +4356,9 @@ Void TEncSearch::xPatternSearchFracDIF_hw(TComDataCU* pcCU,
 
   //  Half-pel refinement
   xExtDIFUpSamplingH ( &cPatternRoi, biPred );
-  
+
+  DumpCUContents(&cPatternRoi);
+
   rcMvHalf = *pcMvInt;   rcMvHalf <<= 1;    // for mv-cost
   TComMv baseRefMv(0, 0);
   ruiCost = xPatternRefinement( pcPatternKey, baseRefMv, 2, rcMvHalf   );

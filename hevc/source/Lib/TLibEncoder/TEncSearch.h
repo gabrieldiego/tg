@@ -445,7 +445,9 @@ protected:
                                     UInt&         ruiCost 
                                    ,Bool biPred
                                    );
-  
+
+  Void DumpCUContents(TComPattern *pattern);
+
   Void xExtDIFUpSamplingH( TComPattern* pcPattern, Bool biPred  );
   Void xExtDIFUpSamplingQ( TComPattern* pcPatternKey, TComMv halfPelRef, Bool biPred );
   
