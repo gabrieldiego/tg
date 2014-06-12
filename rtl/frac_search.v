@@ -11,8 +11,17 @@ module frac_search(filter_pix, ref_pix, in, out, clk, reset);
   reg  [7:0] out;
   wire clk, reset;
 
-  reg [127:0] pix_buffer[3:0];
+  reg [127:0] pix_buffer[2:0];
   reg [3:0]   pix_counter;
+
+  parameter HEIGHT = 8;
+  parameter TAPS = 8;
+  parameter HALF_TAPS = 3; // Index of the center of the filter
+
+  parameter PADDED_CU = 16;
+
+  reg [2:0]   state;
+  parameter IDLE = 0,RECP = 1;
 
   /*
    States of the FSM:
@@ -24,13 +33,14 @@ module frac_search(filter_pix, ref_pix, in, out, clk, reset);
    */
 
   always @(posedge clk)
-    if (reset)
+    if (reset == 1'b1) begin
       pix_counter <= 0;
-    else
-      begin
-        out <= in+1;
-        pix_buffer[pix_counter][7:0] <= filter_pix;
-        pix_counter = pix_counter+1;
-      end
+      state <= IDLE;
+    end
+    else begin
+      out <= in+1;
+      pix_buffer[pix_counter][127:0] <= filter_pix;
+      pix_counter = pix_counter+1;
+    end
 
 endmodule
