@@ -272,6 +272,37 @@ Void TComInterpolationFilter::filterHor(Int bitDepth, Pel *src, Int srcStride, S
   }
 }
 
+#include <iostream>
+#include <iomanip>
+
+using namespace std;
+
+
+Void dump_block(Pel *src, Short *dst, Int srcStride, Int dstStride, Int width, Int height) {
+  cout << "Dump filtered block" << endl;
+  Int row,col;
+
+  for (row = 0; row < height; row++) {
+    for (col = 0; col < width; col++) {
+      cout << setw(3) << hex << src[col];
+    }
+
+    cout << "   ";
+
+    for (col = 0; col < width; col++) {
+      cout << setw(5) << hex << dst[col];
+    }
+
+
+    cout << endl;
+
+    src += srcStride;
+    dst += dstStride;
+  }
+
+  cout << dec;
+}
+
 Void TComInterpolationFilter::filterHorLuma_hw(Int bitDepth, Pel *src, Int srcStride, Short *dst, Int dstStride, Int width, Int height, Bool isLast, Short const *coeff)
 {
   if ( isLast )
@@ -329,11 +360,14 @@ Void TComInterpolationFilter::filterHorLuma_hw(Int bitDepth, Pel *src, Int srcSt
       dst += dstStride;
     }    
 
+    cout << "Max val: " << maxVal << " shift: " << shift << endl;
   }
   else
   {
     filter<NTAPS_LUMA, false, true, false>(bitDepth, src, srcStride, dst, dstStride, width, height, coeff);
   }
+
+  dump_block(src, dst, srcStride, dstStride, width, height);
 }
 
 /**
