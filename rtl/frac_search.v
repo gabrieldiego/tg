@@ -17,7 +17,7 @@ module frac_search(filter_pix, ref_pix, input_ready, mvx, mvy, clk, reset);
 
   parameter HEIGHT = 8;
 
-  reg [1:0] state,next_state;
+  reg       state,next_state;
   parameter IDLE = 0,
             RECV = 1;
 
@@ -57,7 +57,7 @@ module frac_search(filter_pix, ref_pix, input_ready, mvx, mvy, clk, reset);
       IDLE: begin
         mvx <= filter_pix[1:0];
         mvy <= ref_pix[1:0];
-        pix_buffer = filter_pix;
+        pix_buffer <= filter_pix;
 
         if(input_ready)
           next_state <= RECV;
@@ -68,7 +68,7 @@ module frac_search(filter_pix, ref_pix, input_ready, mvx, mvy, clk, reset);
         mvx <= pix_counter[1:0];
         mvy <= pix_counter[2:1];
 
-        pix_buffer = filter_pix;
+        pix_buffer <= filter_pix;
         pix_counter = pix_counter+1;
 
         if(pix_counter == 0)
