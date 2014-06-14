@@ -1,3 +1,5 @@
+`timescale 10 us / 1 us
+
 module frac_search_tb;
 
   reg [7:0] in=0;
