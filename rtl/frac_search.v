@@ -55,26 +55,26 @@ module frac_search(filter_pix, ref_pix, input_ready, mvx, mvy, clk, reset);
   always @(posedge clk) begin
     case(state)
       IDLE: begin
-        mvx <= filter_pix[1:0];
-        mvy <= ref_pix[1:0];
+        mvx <= 3'b0;
+        mvy <= 3'b0;
         pix_buffer <= filter_pix;
 
         if(input_ready)
-          next_state <= RECV;
+          next_state <= #1 RECV;
         else
-          next_state <= IDLE;
+          next_state <= #1 IDLE;
       end
       RECV: begin
-        mvx <= pix_counter[1:0];
-        mvy <= pix_counter[2:1];
+        mvx <= pix_counter[2:0];
+        mvy <= pix_counter[2:0]+2;
 
         pix_buffer <= filter_pix;
         pix_counter = pix_counter+1;
 
         if(pix_counter == 0)
-          next_state <= IDLE;
+          next_state <= #1 IDLE;
         else
-          next_state <= RECV;
+          next_state <= #1 RECV;
       end
     endcase
   end
