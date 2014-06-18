@@ -34,13 +34,17 @@ module frac_search(filter_pix, ref_pix, input_ready, mvx, mvy, clk, reset);
   wire [7:0] filter_array[7:0]; // Can't use vector as input, so we declare as a wire
   wire [7:0] ref_array[7:0];
 
+  wire [60:0] sad;
+
+  compute_sad cs(filter_pix, ref_pix, input_ready, sad);
+
   assign {filter_array[7],filter_array[6],filter_array[5],filter_array[4],
           filter_array[3],filter_array[2],filter_array[1],filter_array[0]} = filter_pix;
 
   assign {ref_array[7],ref_array[6],ref_array[5],ref_array[4],
           ref_array[3],ref_array[2],ref_array[1],ref_array[0]} = ref_pix;
 
-  always @(posedge clk)
+  always @(posedge clk or posedge reset)
     if (reset == 1'b1) begin
       state <= IDLE;
       next_state <= IDLE;
@@ -68,13 +72,16 @@ module frac_search(filter_pix, ref_pix, input_ready, mvx, mvy, clk, reset);
         mvx <= pix_counter[2:0];
         mvy <= pix_counter[2:0]+2;
 
-        pix_buffer <= filter_pix;
-        pix_counter = pix_counter+1;
+        if(input_ready) begin
 
-        if(pix_counter == 0)
-          next_state <= #1 IDLE;
-        else
-          next_state <= #1 RECV;
+          pix_buffer <= filter_pix;
+          pix_counter <= pix_counter+1;
+
+          if(pix_counter == 8'hF)
+            next_state <= #1 IDLE;
+          else
+            next_state <= #1 RECV;
+        end
       end
     endcase
   end
