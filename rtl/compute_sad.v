@@ -4,6 +4,7 @@ module compute_sad(filter_pix, ref_pix, input_ready, sad);
   input        input_ready;
 
   output [12*5:0] sad;
+  output [8*7:0]  hpel_array;
   // 12 bits for each result sad the difference of each pixel is 9 bits wide
   // and there are 6 integers of 9 bits to add, thus we use 3 extra bits.
 
@@ -46,16 +47,16 @@ module compute_sad(filter_pix, ref_pix, input_ready, sad);
   genvar          i;
   generate
     for(i=0; i<=6; i=i+1) begin
-      assign hpel[i] = (filter_array[i] + filter_array[i+1])>>1;
-      // The resulting sum is 9 bit, but the shift will bring the total back to 8
+      assign hpel[i] = (filter_array[i] + filter_array[i+1])/2;
+      // The resulting sum is 9 bit, but the division will bring the total back to 8
       // TODO: Must test to see if synthesizer will do this right using 255 as input
     end
   endgenerate
 
   generate
     for(i=0; i<=6; i=i+1) begin
-      assign qpel[2*i]   = (3*filter_array[i] +   filter_array[i+1])>>2;
-      assign qpel[2*i+1] = (  filter_array[i] + 3*filter_array[i+1])>>2;
+      assign qpel[2*i]   = (3*filter_array[i] +   filter_array[i+1])/4;
+      assign qpel[2*i+1] = (  filter_array[i] + 3*filter_array[i+1])/4;
       // Same here but the rounding is 10 bit to 8
       // TODO: Also test for the extreme cases in syntesizer
     end
