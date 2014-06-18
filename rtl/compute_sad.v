@@ -43,12 +43,6 @@ module compute_sad(filter_pix, ref_pix, input_ready, sad);
   wire [7:0]      hpel[6:0];
   wire [7:0]      qpel[13:0];
 
-  wire signed [10:0] diff_left_quarter[6:1];
-  wire signed [10:0] diff_left_half[6:1];
-  wire signed [10:0] diff_full_pixel[6:1];
-  wire signed [10:0] diff_right_half[6:1];
-  wire signed [10:0] diff_right_quarter[6:1];
-
   genvar          i;
   generate
     for(i=0; i<=6; i=i+1) begin
@@ -67,6 +61,13 @@ module compute_sad(filter_pix, ref_pix, input_ready, sad);
     end
   endgenerate
 
+  // Each diff must contain one extra bit because the result lies in [-255..255]
+  wire signed [8:0] diff_left_quarter[6:1];
+  wire signed [8:0] diff_left_half[6:1];
+  wire signed [8:0] diff_full_pixel[6:1];
+  wire signed [8:0] diff_right_half[6:1];
+  wire signed [8:0] diff_right_quarter[6:1];
+
   generate
     for(i=1; i<=6; i=i+1) begin
       assign diff_left_quarter[i] = qpel[2*i-1] - ref_array[i];
@@ -77,13 +78,37 @@ module compute_sad(filter_pix, ref_pix, input_ready, sad);
     end
   endgenerate
 
-  generate
-    for(i=1; i<=6; i=i+1) begin
-      assign sad[4] = diff_left_quarter[i] < 0 ? 
-      if(diff_left_quarter[i] < 0)
-        sad[4] = sad[4] - diff_left_quarter[i];
+  // Since there is no abs() in Verilog we have to implement
+  function abs9;
+    input  [8:0] in;
+
+    begin
+      if($signed(in)<0)
+        abs9 = -$signed(in);
       else
-        sad[4] = sad[4] + diff_left_quarter[i];
-  end
-  endgenerate
+        abs9 = in;
+    end
+  endfunction
+
+  // Verilog doesn't have any sum() so we do this by hand too
+  assign sad_array[4] = abs9(diff_left_quarter[1])+abs9(diff_left_quarter[2])+
+                        abs9(diff_left_quarter[3])+abs9(diff_left_quarter[4])+
+                        abs9(diff_left_quarter[5])+abs9(diff_left_quarter[6]);
+
+  assign sad_array[3] = abs9(diff_left_half[1])+abs9(diff_left_half[2])+
+                        abs9(diff_left_half[3])+abs9(diff_left_half[4])+
+                        abs9(diff_left_half[5])+abs9(diff_left_half[6]);
+
+  assign sad_array[2] = abs9(diff_full_pixel[1])+abs9(diff_full_pixel[2])+
+                        abs9(diff_full_pixel[3])+abs9(diff_full_pixel[4])+
+                        abs9(diff_full_pixel[5])+abs9(diff_full_pixel[6]);
+
+  assign sad_array[1] = abs9(diff_right_half[1])+abs9(diff_right_half[2])+
+                        abs9(diff_right_half[3])+abs9(diff_right_half[4])+
+                        abs9(diff_right_half[5])+abs9(diff_right_half[6]);
+
+  assign sad_array[0] = abs9(diff_right_quarter[1])+abs9(diff_right_quarter[2])+
+                        abs9(diff_right_quarter[3])+abs9(diff_right_quarter[4])+
+                        abs9(diff_right_quarter[5])+abs9(diff_right_quarter[6]);
+
 endmodule
