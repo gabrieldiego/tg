@@ -34,7 +34,7 @@ module frac_search(filter_pix, ref_pix, input_ready, mvx, mvy, clk, reset);
   wire [7:0] filter_array[7:0]; // Can't use vector as input, so we declare as a wire
   wire [7:0] ref_array[7:0];
 
-  wire [60:0] sad;
+  wire [59:0] sad;
 
   compute_sad cs(filter_pix, ref_pix, input_ready, sad);
 

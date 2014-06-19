@@ -3,7 +3,7 @@ module compute_sad(filter_pix, ref_pix, input_ready, sad);
   input [63:0] ref_pix;
   input        input_ready;
 
-  output [12*5:0] sad;
+  output [59:0] sad;
   output [8*7:0]  hpel_array;
   // 12 bits for each result sad the difference of each pixel is 9 bits wide
   // and there are 6 integers of 9 bits to add, thus we use 3 extra bits.
@@ -31,7 +31,7 @@ module compute_sad(filter_pix, ref_pix, input_ready, sad);
 
   wire [7:0]      filter_array[7:0]; // Can't use vector as input, so we declare as a wire
   wire [7:0]      ref_array[7:0];
-  wire [12:0]     sad_array[4:0];
+  wire [11:0]     sad_array[4:0];
 
   assign {filter_array[7],filter_array[6],filter_array[5],filter_array[4],
           filter_array[3],filter_array[2],filter_array[1],filter_array[0]} = filter_pix;
@@ -63,53 +63,41 @@ module compute_sad(filter_pix, ref_pix, input_ready, sad);
   endgenerate
 
   // Each diff must contain one extra bit because the result lies in [-255..255]
-  wire signed [8:0] diff_left_quarter[6:1];
-  wire signed [8:0] diff_left_half[6:1];
-  wire signed [8:0] diff_full_pixel[6:1];
-  wire signed [8:0] diff_right_half[6:1];
-  wire signed [8:0] diff_right_quarter[6:1];
+  wire [7:0] diff_left_quarter[6:1];
+  wire [7:0] diff_left_half[6:1];
+  wire [7:0] diff_full_pixel[6:1];
+  wire [7:0] diff_right_half[6:1];
+  wire [7:0] diff_right_quarter[6:1];
 
   generate
     for(i=1; i<=6; i=i+1) begin
-      assign diff_left_quarter[i] = qpel[2*i-1] - ref_array[i];
-      assign diff_left_half[i] = hpel[i-1] - ref_array[i];
-      assign diff_full_pixel[i] = filter_array[i] - ref_array[i];
-      assign diff_right_half[i] = hpel[i] - ref_array[i];
-      assign diff_right_quarter[i] = qpel[2*i] - ref_array[i];
+      abs_diff ad5(qpel[2*i-1], ref_array[i], diff_left_quarter[i]);
+      abs_diff ad4(hpel[i-1], ref_array[i], diff_left_half[i]);
+      abs_diff ad3(filter_array[i], ref_array[i], diff_full_pixel[i]);
+      abs_diff ad2(hpel[i], ref_array[i], diff_right_half[i]);
+      abs_diff ad1(qpel[2*i], ref_array[i], diff_right_quarter[i]);
     end
   endgenerate
 
-  // Since there is no abs() in Verilog we have to implement
-  function abs9;
-    input  [8:0] in;
-
-    begin
-      if($signed(in)<0)
-        abs9 = -$signed(in);
-      else
-        abs9 = in;
-    end
-  endfunction
-
   // Verilog doesn't have any sum() so we do this by hand too
-  assign sad_array[4] = abs9(diff_left_quarter[1])+abs9(diff_left_quarter[2])+
-                        abs9(diff_left_quarter[3])+abs9(diff_left_quarter[4])+
-                        abs9(diff_left_quarter[5])+abs9(diff_left_quarter[6]);
+  assign sad_array[4] = diff_left_quarter[1]+diff_left_quarter[2]+
+                        diff_left_quarter[3]+diff_left_quarter[4]+
+                        diff_left_quarter[5]+diff_left_quarter[6];
 
-  assign sad_array[3] = abs9(diff_left_half[1])+abs9(diff_left_half[2])+
-                        abs9(diff_left_half[3])+abs9(diff_left_half[4])+
-                        abs9(diff_left_half[5])+abs9(diff_left_half[6]);
+  assign sad_array[3] = diff_left_half[1]+diff_left_half[2]+
+                        diff_left_half[3]+diff_left_half[4]+
+                        diff_left_half[5]+diff_left_half[6];
 
-  assign sad_array[2] = abs9(diff_full_pixel[1])+abs9(diff_full_pixel[2])+
-                        abs9(diff_full_pixel[3])+abs9(diff_full_pixel[4])+
-                        abs9(diff_full_pixel[5])+abs9(diff_full_pixel[6]);
+  assign sad_array[2] = diff_full_pixel[1]+diff_full_pixel[2]+
+                        diff_full_pixel[3]+diff_full_pixel[4]+
+                        diff_full_pixel[5]+diff_full_pixel[6];
 
-  assign sad_array[1] = abs9(diff_right_half[1])+abs9(diff_right_half[2])+
-                        abs9(diff_right_half[3])+abs9(diff_right_half[4])+
-                        abs9(diff_right_half[5])+abs9(diff_right_half[6]);
+  assign sad_array[1] = diff_right_half[1]+diff_right_half[2]+
+                        diff_right_half[3]+diff_right_half[4]+
+                        diff_right_half[5]+diff_right_half[6];
 
-  assign sad_array[0] = abs9(diff_right_quarter[1])+abs9(diff_right_quarter[2])+
-                        abs9(diff_right_quarter[3])+abs9(diff_right_quarter[4])+
-                        abs9(diff_right_quarter[5])+abs9(diff_right_quarter[6]);
+  assign sad_array[0] = diff_right_quarter[1]+diff_right_quarter[2]+
+                        diff_right_quarter[3]+diff_right_quarter[4]+
+                        diff_right_quarter[5]+diff_right_quarter[6];
 
 endmodule
