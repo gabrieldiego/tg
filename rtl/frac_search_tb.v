@@ -24,8 +24,9 @@ module frac_search_tb;
   reg [63:0] filter_pix;
   reg [63:0] ref_pix;
 
-  assign filter_pix2 = {filter_array[7],filter_array[6],filter_array[5],filter_array[4],
-                       filter_array[3],filter_array[2],filter_array[1],filter_array[0]};
+  assign filter_pix2 =
+    {filter_array[7],filter_array[6],filter_array[5],filter_array[4],
+     filter_array[3],filter_array[2],filter_array[1],filter_array[0]};
 
   assign ref_pix2 = {ref_array[7],ref_array[6],ref_array[5],ref_array[4],
                     ref_array[3],ref_array[2],ref_array[1],ref_array[0]};

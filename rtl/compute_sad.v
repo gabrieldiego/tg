@@ -4,7 +4,6 @@ module compute_sad(filter_pix, ref_pix, input_ready, sad);
   input        input_ready;
 
   output [59:0] sad;
-  output [8*7:0]  hpel_array;
   // 12 bits for each result sad the difference of each pixel is 9 bits wide
   // and there are 6 integers of 9 bits to add, thus we use 3 extra bits.
 
@@ -46,7 +45,7 @@ module compute_sad(filter_pix, ref_pix, input_ready, sad);
 
   genvar          i;
   generate
-    for(i=0; i<=6; i=i+1) begin
+    for(i=0; i<=6; i=i+1) begin: hpel_generate
       assign hpel[i] = (filter_array[i] + filter_array[i+1])/2;
       // The resulting sum is 9 bit, but the division will bring the total back to 8
       // TODO: Must test to see if synthesizer will do this right using 255 as input
@@ -54,7 +53,7 @@ module compute_sad(filter_pix, ref_pix, input_ready, sad);
   endgenerate
 
   generate
-    for(i=0; i<=6; i=i+1) begin
+    for(i=0; i<=6; i=i+1) begin: qpel_generate
       assign qpel[2*i]   = (3*filter_array[i] +   filter_array[i+1])/4;
       assign qpel[2*i+1] = (  filter_array[i] + 3*filter_array[i+1])/4;
       // Same here but the rounding is 10 bit to 8
@@ -70,7 +69,7 @@ module compute_sad(filter_pix, ref_pix, input_ready, sad);
   wire [7:0] diff_right_quarter[6:1];
 
   generate
-    for(i=1; i<=6; i=i+1) begin
+    for(i=1; i<=6; i=i+1) begin: abs_diff_generate
       abs_diff ad5(qpel[2*i-1], ref_array[i], diff_left_quarter[i]);
       abs_diff ad4(hpel[i-1], ref_array[i], diff_left_half[i]);
       abs_diff ad3(filter_array[i], ref_array[i], diff_full_pixel[i]);
