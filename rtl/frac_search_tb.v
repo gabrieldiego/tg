@@ -24,6 +24,8 @@ module frac_search_tb;
   reg [63:0] filter_pix;
   reg [63:0] ref_pix;
 
+  reg        clk =0;
+
   assign filter_pix2 =
     {filter_array[7],filter_array[6],filter_array[5],filter_array[4],
      filter_array[3],filter_array[2],filter_array[1],filter_array[0]};
@@ -70,7 +72,6 @@ module frac_search_tb;
 
   frac_search fs(filter_pix,ref_pix,input_ready,mvx,mvy,clk,reset);
 
-  reg clk = 0;
   always #10 clk = !clk;
 
   initial
