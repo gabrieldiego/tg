@@ -1,12 +1,10 @@
 `timescale 10 us / 1 us
+`define NULL 0
 
 module frac_search_tb;
 
   reg [7:0] in=0;
   reg reset=0;
-
-  wire [63:0] filter_pix2;
-  wire [63:0] ref_pix2;
 
   reg         input_ready;
 
@@ -21,19 +19,27 @@ module frac_search_tb;
   reg [7:0] filter_array[7:0];
   reg [7:0] ref_array[7:0];
 
-  reg [63:0] filter_pix;
-  reg [63:0] ref_pix;
+  wire [63:0] filter_pix;
+  wire [63:0] ref_pix;
 
   reg        clk =0;
 
-  assign filter_pix2 =
+  integer    input_file;
+
+  assign filter_pix =
     {filter_array[7],filter_array[6],filter_array[5],filter_array[4],
      filter_array[3],filter_array[2],filter_array[1],filter_array[0]};
 
-  assign ref_pix2 = {ref_array[7],ref_array[6],ref_array[5],ref_array[4],
+  assign ref_pix = {ref_array[7],ref_array[6],ref_array[5],ref_array[4],
                     ref_array[3],ref_array[2],ref_array[1],ref_array[0]};
 
   initial begin
+    input_file = $fopen("/home/gabriel/Dev/tg/rtl/test.txt", "r");
+    if (input_file == `NULL) begin
+      $display("input_file handle was NULL");
+      $finish;
+    end
+
     @(posedge clk) begin
       reset = 1;
       input_ready = 0;
@@ -47,7 +53,7 @@ module frac_search_tb;
     forever begin
       @(posedge clk) begin
         for(i=0; i<8; i=i+1) begin
-          c = $fscanf(STDIN,"%x",tmp);
+          c = $fscanf(input_file,"%x",tmp);
           if(c != 1)
             $finish;
 
@@ -55,16 +61,16 @@ module frac_search_tb;
         end
 
         for(i=0; i<8; i=i+1) begin
-          c = $fscanf(STDIN,"%x",tmp);
-          if(c != 1)
+          c = $fscanf(input_file,"%x",tmp);
+          if(c != 1) begin
+            @(posedge clk) // Wait for last clock tick
             $finish;
+          end
 
           ref_array[i] = tmp;
         end
 
-        filter_pix <= #1 filter_pix2;
-        ref_pix <= #1 ref_pix2;
-        input_ready <= #1 1;
+        input_ready <= 1;
 
       end
     end
