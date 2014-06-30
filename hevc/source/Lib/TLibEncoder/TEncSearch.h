@@ -145,6 +145,9 @@ protected:
   UInt  xPatternRefinement( TComPattern* pcPatternKey,
                            TComMv baseRefMv,
                            Int iFrac, TComMv& rcMvFrac );
+  UInt  xPatternRefinement_hw( TComPattern* pcPatternKey,
+                           TComMv baseRefMv,
+                           Int iFrac, TComMv& rcMvFrac );
   
   typedef struct
   {
