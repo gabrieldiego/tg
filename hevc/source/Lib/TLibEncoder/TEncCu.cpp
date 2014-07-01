@@ -361,7 +361,8 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, UInt u
   Bool    bSubBranch = true;
 
   // variable for Cbf fast mode PU decision
-  Bool    doNotBlockPu = true;
+//  Bool    doNotBlockPu = true;
+  const Bool    doNotBlockPu = false;
   Bool earlyDetectionSkipMode = false;
 
   Bool bBoundary = false;
@@ -430,7 +431,8 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, UInt u
       if( rpcBestCU->getSlice()->getSliceType() != I_SLICE )
       {
         // 2Nx2N
-        if(m_pcEncCfg->getUseEarlySkipDetection())
+//        if(m_pcEncCfg->getUseEarlySkipDetection())
+        if(0)
         {
           xCheckRDCostInter( rpcBestCU, rpcTempCU, SIZE_2Nx2N );
           rpcTempCU->initEstData( uiDepth, iQP, bIsLosslessMode );//by Competition for inter_2Nx2N
@@ -439,14 +441,15 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, UInt u
         xCheckRDCostMerge2Nx2N( rpcBestCU, rpcTempCU, &earlyDetectionSkipMode );//by Merge for inter_2Nx2N
         rpcTempCU->initEstData( uiDepth, iQP, bIsLosslessMode );
 
-        if(!m_pcEncCfg->getUseEarlySkipDetection())
+//        if(!m_pcEncCfg->getUseEarlySkipDetection())
+        if(0)
         {
           // 2Nx2N, NxN
           xCheckRDCostInter( rpcBestCU, rpcTempCU, SIZE_2Nx2N );
           rpcTempCU->initEstData( uiDepth, iQP, bIsLosslessMode );
           if(m_pcEncCfg->getUseCbfFastMode())
           {
-            doNotBlockPu = rpcBestCU->getQtRootCbf( 0 ) != 0;
+            //doNotBlockPu = rpcBestCU->getQtRootCbf( 0 ) != 0;
           }
         }
       }
@@ -475,7 +478,8 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, UInt u
           // 2Nx2N, NxN
           if(!( (rpcBestCU->getWidth(0)==8) && (rpcBestCU->getHeight(0)==8) ))
           {
-            if( uiDepth == g_uiMaxCUDepth - g_uiAddCUDepth && doNotBlockPu)
+//            if( uiDepth == g_uiMaxCUDepth - g_uiAddCUDepth && doNotBlockPu)
+            if(1)
             {
               xCheckRDCostInter( rpcBestCU, rpcTempCU, SIZE_NxN   );
               rpcTempCU->initEstData( uiDepth, iQP, bIsLosslessMode );
@@ -489,7 +493,7 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, UInt u
             rpcTempCU->initEstData( uiDepth, iQP, bIsLosslessMode );
             if(m_pcEncCfg->getUseCbfFastMode() && rpcBestCU->getPartitionSize(0) == SIZE_Nx2N )
             {
-              doNotBlockPu = rpcBestCU->getQtRootCbf( 0 ) != 0;
+//              doNotBlockPu = rpcBestCU->getQtRootCbf( 0 ) != 0;
             }
           }
           if(doNotBlockPu)
@@ -498,7 +502,7 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, UInt u
             rpcTempCU->initEstData( uiDepth, iQP, bIsLosslessMode );
             if(m_pcEncCfg->getUseCbfFastMode() && rpcBestCU->getPartitionSize(0) == SIZE_2NxN)
             {
-              doNotBlockPu = rpcBestCU->getQtRootCbf( 0 ) != 0;
+//              doNotBlockPu = rpcBestCU->getQtRootCbf( 0 ) != 0;
             }
           }
 
@@ -526,7 +530,7 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, UInt u
                 rpcTempCU->initEstData( uiDepth, iQP, bIsLosslessMode );
                 if(m_pcEncCfg->getUseCbfFastMode() && rpcBestCU->getPartitionSize(0) == SIZE_2NxnU )
                 {
-                  doNotBlockPu = rpcBestCU->getQtRootCbf( 0 ) != 0;
+//                  doNotBlockPu = rpcBestCU->getQtRootCbf( 0 ) != 0;
                 }
               }
               if(doNotBlockPu)
@@ -535,7 +539,7 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, UInt u
                 rpcTempCU->initEstData( uiDepth, iQP, bIsLosslessMode );
                 if(m_pcEncCfg->getUseCbfFastMode() && rpcBestCU->getPartitionSize(0) == SIZE_2NxnD )
                 {
-                  doNotBlockPu = rpcBestCU->getQtRootCbf( 0 ) != 0;
+//                  doNotBlockPu = rpcBestCU->getQtRootCbf( 0 ) != 0;
                 }
               }
             }
@@ -548,7 +552,7 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, UInt u
                 rpcTempCU->initEstData( uiDepth, iQP, bIsLosslessMode );
                 if(m_pcEncCfg->getUseCbfFastMode() && rpcBestCU->getPartitionSize(0) == SIZE_2NxnU )
                 {
-                  doNotBlockPu = rpcBestCU->getQtRootCbf( 0 ) != 0;
+//                  doNotBlockPu = rpcBestCU->getQtRootCbf( 0 ) != 0;
                 }
               }
               if(doNotBlockPu)
@@ -557,7 +561,7 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, UInt u
                 rpcTempCU->initEstData( uiDepth, iQP, bIsLosslessMode );
                 if(m_pcEncCfg->getUseCbfFastMode() && rpcBestCU->getPartitionSize(0) == SIZE_2NxnD )
                 {
-                  doNotBlockPu = rpcBestCU->getQtRootCbf( 0 ) != 0;
+//                  doNotBlockPu = rpcBestCU->getQtRootCbf( 0 ) != 0;
                 }
               }
             }
@@ -572,7 +576,7 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, UInt u
                 rpcTempCU->initEstData( uiDepth, iQP, bIsLosslessMode );
                 if(m_pcEncCfg->getUseCbfFastMode() && rpcBestCU->getPartitionSize(0) == SIZE_nLx2N )
                 {
-                  doNotBlockPu = rpcBestCU->getQtRootCbf( 0 ) != 0;
+//                  doNotBlockPu = rpcBestCU->getQtRootCbf( 0 ) != 0;
                 }
               }
               if(doNotBlockPu)
@@ -590,7 +594,7 @@ Void TEncCu::xCompressCU( TComDataCU*& rpcBestCU, TComDataCU*& rpcTempCU, UInt u
                 rpcTempCU->initEstData( uiDepth, iQP, bIsLosslessMode );
                 if(m_pcEncCfg->getUseCbfFastMode() && rpcBestCU->getPartitionSize(0) == SIZE_nLx2N )
                 {
-                  doNotBlockPu = rpcBestCU->getQtRootCbf( 0 ) != 0;
+//                  doNotBlockPu = rpcBestCU->getQtRootCbf( 0 ) != 0;
                 }
               }
               if(doNotBlockPu)

@@ -360,14 +360,14 @@ Void TComInterpolationFilter::filterHorLuma_hw(Int bitDepth, Pel *src, Int srcSt
       dst += dstStride;
     }    
 
-    cout << "Max val: " << maxVal << " shift: " << shift << endl;
+//    cout << "Max val: " << maxVal << " shift: " << shift << endl;
   }
   else
   {
     filter<NTAPS_LUMA, false, true, false>(bitDepth, src, srcStride, dst, dstStride, width, height, coeff);
   }
 
-  dump_block(src, dst, srcStride, dstStride, width, height);
+//  dump_block(src, dst, srcStride, dstStride, width, height);
 }
 
 /**

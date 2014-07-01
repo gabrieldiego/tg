@@ -805,7 +805,7 @@ UInt TEncSearch::xPatternRefinement_hw( TComPattern* pcPatternKey,
     m_cDistParam.bitDepth = g_bitDepthY;
     uiDist = m_cDistParam.DistFunc( &m_cDistParam );
     uiDist += m_pcRdCost->getCost( cMvTest.getHor(), cMvTest.getVer() );
-    cout << "uiDist: " << uiDist << endl;
+//    cout << "uiDist: " << uiDist << endl;
 
     if ( uiDist < uiDistBest )
     {
@@ -3118,6 +3118,7 @@ Void TEncSearch::predInterSearch( TComDataCU* pcCU, TComYuv* pcOrgYuv, TComYuv*&
 Void TEncSearch::predInterSearch( TComDataCU* pcCU, TComYuv* pcOrgYuv, TComYuv*& rpcPredYuv, TComYuv*& rpcResiYuv, TComYuv*& rpcRecoYuv, Bool bUseRes )
 #endif
 {
+  
   m_acYuvPred[0].clear();
   m_acYuvPred[1].clear();
   m_cYuvPredTemp.clear();
@@ -4016,7 +4017,7 @@ Void TEncSearch::xMotionEstimation( TComDataCU* pcCU, TComYuv* pcYuvOrg, Int iPa
   
   TComYuv*      pcYuv = pcYuvOrg;
   m_iSearchRange = m_aaiAdaptSR[eRefPicList][iRefIdxPred];
-  
+
   Int           iSrchRng      = ( bBi ? m_bipredSearchRange : m_iSearchRange );
   TComPattern*  pcPatternKey  = pcCU->getPattern        ();
   
@@ -4383,6 +4384,65 @@ Void TEncSearch::DumpCUContents(TComPattern *pattern)
   }
 }
 
+void dump_ref_block(Pel *src, Int w, Int h, Int s) {
+  Int a,b;
+
+  for(a=0;a<h;a++) {
+    for(b=0;b<w;b++) {
+      cout << setw(3) << hex << src[b+a*s] << dec;
+    }
+    cout << endl;
+  }
+  cout << endl;
+}
+
+UInt refine_mv(Pel *Cur, Pel *Org, Int strideCur, Int StrideOrg, TComMv& mv) {
+  Int a,b;
+  Int h=8,w=8;
+
+  for(a=1;a<h-1;a++) {
+    for(b=1;b<w-1;b++) {
+      Pel UHLH,UHLQ,UHF,UHRQ,UHRH;
+      Pel UQLH,UQLQ,UQF,UQRQ,UQRH;
+      Pel   LH,  LQ,  F,  RQ,  RH;
+      Pel LQLH,LQLQ,LQF,LQRQ,LQRH;
+      Pel LHLH,LHLQ,LHF,LHRQ,LHRH;
+
+      Pel LU , U, RU;
+      Pel LUH,    RUH;
+      Pel LUQ,    RUQ;
+      Pel L  ,    R;
+      Pel LD , D, RD;
+
+      F = Org[a*StrideOrg+b];
+
+      LU = Org[(a-1)*StrideOrg+b-1];
+      U  = Org[(a-1)*StrideOrg+b  ];
+      RU = Org[(a-1)*StrideOrg+b+1];
+      L = Org[    a*StrideOrg+b-1];
+      R = Org[    a*StrideOrg+b+1];
+      LD = Org[(a+1)*StrideOrg+b-1];
+      D  = Org[(a+1)*StrideOrg+b  ];
+      RD = Org[(a+1)*StrideOrg+b+1];
+
+      LH = (L+F)>>1;
+      RH = (R+F)>>1;
+
+      LQ = (L+3*F)>>2;
+      RQ = (R+3*F)>>2;
+
+      UHF=(U+F)>>1;
+      LHF=(L+F)>>1;
+
+      UQF=(U+3*F)>>2;
+      LQF=(L+3*F)>>2;
+
+    }
+  }
+
+  return 0;
+}
+
 Void TEncSearch::xPatternSearchFracDIF_hw(TComDataCU* pcCU,
                                        TComPattern* pcPatternKey,
                                        Pel* piRefY,
@@ -4418,6 +4478,36 @@ Void TEncSearch::xPatternSearchFracDIF_hw(TComDataCU* pcCU,
 
   rcMvHalf = *pcMvInt;   rcMvHalf <<= 1;    // for mv-cost
   TComMv baseRefMv(0, 0);
+
+  cout << "dump block" << endl;
+
+  if(pcPatternKey->getROIYWidth() != 8 || pcPatternKey->getROIYHeight() != 8) {
+    cerr << "Invalid TU size" << endl;
+    exit(-1);
+  }
+
+  dump_ref_block(pcPatternKey->getROIY(),
+                 pcPatternKey->getROIYWidth(),
+                 pcPatternKey->getROIYHeight(),
+                 pcPatternKey->getPatternLStride()
+                );
+
+  dump_ref_block(m_cDistParam.pCur,
+                 8,
+                 8,
+                 m_cDistParam.iStrideCur*(1<<m_cDistParam.iSubShift)
+                );
+
+  TComMv pred_mv(0,0);
+  UInt cost;
+
+  cost = refine_mv(pcPatternKey->getROIY(),m_cDistParam.pCur,
+                   pcPatternKey->getPatternLStride(),
+                   m_cDistParam.iStrideCur*(1<<m_cDistParam.iSubShift),
+                   pred_mv
+                  );
+  (void)cost;
+
   ruiCost = xPatternRefinement_hw( pcPatternKey, baseRefMv, 2, rcMvHalf   );
   
   m_pcRdCost->setCostScale( 0 );
