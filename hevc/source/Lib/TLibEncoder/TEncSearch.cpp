@@ -4396,51 +4396,125 @@ void dump_ref_block(Pel *src, Int w, Int h, Int s) {
   cout << endl;
 }
 
-UInt refine_mv(Pel *Cur, Pel *Org, Int strideCur, Int StrideOrg, TComMv& mv) {
+Void filter_line(Pel *Line, Pel *Org, Int Step) {
+  Line[0] =  Org[-Step];
+  Line[1] = (Org[-Step] +   Org[0]) >> 1;
+  Line[2] = (Org[-Step] + 3*Org[0]) >> 2;
+  Line[3] =  Org[0];
+  Line[4] = (Org[ Step] + 3*Org[0]   ) >>2;
+  Line[5] = (Org[0]     +   Org[Step]) >>1;
+  Line[6] =  Org[Step];
+}
+
+Void vector_sad(UInt *res, Pel *vector, Pel pixel, Int len) {
+  for( ; len>0; len--) {
+    res[len-1] += abs(vector[len-1]-pixel);
+  }
+}
+
+UInt refine_mv(Pel *Cur, Pel *Org, Int StrideCur, Int StrideOrg, TComMv& mv) {
   Int a,b;
   Int h=8,w=8;
+  Pel UF[7],UH[7],UQ[7],M[7],LQ[7],LH[7],LF[7];
 
-  for(a=1;a<h-1;a++) {
-    for(b=1;b<w-1;b++) {
-      Pel UHLH,UHLQ,UHF,UHRQ,UHRH;
-      Pel UQLH,UQLQ,UQF,UQRQ,UQRH;
-      Pel   LH,  LQ,  F,  RQ,  RH;
-      Pel LQLH,LQLQ,LQF,LQRQ,LQRH;
-      Pel LHLH,LHLQ,LHF,LHRQ,LHRH;
+  UInt SadCost[25];
+  UInt SmallestSad;
+  UInt SmallestSadI;
+  // Lines: Upper Full, Upper Half, Upper Quarter, Middle, Lower Quarter, Lower Half, Lower Full
 
-      Pel LU , U, RU;
-      Pel LUH,    RUH;
-      Pel LUQ,    RUQ;
-      Pel L  ,    R;
-      Pel LD , D, RD;
+  // Follow the next diagram:
+  // 0   1 2 3 4 5   6 <-- Index
+  //
+  // o   + + o + +   o <-- Upper Full
+  //
+  // +   x x x x x   + <-- Upper Half
+  //     x x x x x     <-- Upper Quarter
+  // o   x x o x x   o <-- Middle
+  //     x x x x x     <-- Lower Quarter
+  // +   x x x x x   + <-- Lower Half
+  //
+  // o   + + o + +   o <-- Lower Full
+  //
+  // o --> Full pixel positions
+  // x --> Fractional pixel positions
+  // + --> Fractional pixel positions that are needed to calculate some 'x'
 
-      F = Org[a*StrideOrg+b];
+  memset(SadCost,0,sizeof(SadCost));
 
-      LU = Org[(a-1)*StrideOrg+b-1];
-      U  = Org[(a-1)*StrideOrg+b  ];
-      RU = Org[(a-1)*StrideOrg+b+1];
-      L = Org[    a*StrideOrg+b-1];
-      R = Org[    a*StrideOrg+b+1];
-      LD = Org[(a+1)*StrideOrg+b-1];
-      D  = Org[(a+1)*StrideOrg+b  ];
-      RD = Org[(a+1)*StrideOrg+b+1];
+  for(a=1; a<h-1; a++) {
+    for(b=1; b<w-1; b++) {
+      Pel CurP = Cur[a*StrideCur+b];
 
-      LH = (L+F)>>1;
-      RH = (R+F)>>1;
+      filter_line(M, Org +   a * StrideOrg + b,1);
+      filter_line(UF,Org +(a-1)* StrideOrg + b,1);
+      filter_line(LF,Org +(a+1)* StrideOrg + b,1);
 
-      LQ = (L+3*F)>>2;
-      RQ = (R+3*F)>>2;
+      // Upper Half
+      UH[0] = (UF[0] + M[0]) >> 1;
+      UH[1] = (UF[1] + M[1]) >> 1;
+      UH[3] = (UF[3] + M[3]) >> 1;
+      UH[5] = (UF[5] + M[5]) >> 1;
+      UH[6] = (UF[6] + M[6]) >> 1;
 
-      UHF=(U+F)>>1;
-      LHF=(L+F)>>1;
+      UH[2] = (UH[0] + 3*UH[3]) >> 2;
+      UH[4] = (UH[6] + 3*UH[3]) >> 2;
 
-      UQF=(U+3*F)>>2;
-      LQF=(L+3*F)>>2;
+      // Lower Half
+      LH[0] = (LF[0] + M[0]) >> 1;
+      LH[1] = (LF[1] + M[1]) >> 1;
+      LH[3] = (LF[3] + M[3]) >> 1;
+      LH[5] = (LF[5] + M[5]) >> 1;
+      LH[6] = (LF[6] + M[6]) >> 1;
 
+      LH[2] = (LH[0] + 3*LH[3]) >> 2;
+      LH[4] = (LH[6] + 3*LH[3]) >> 2;
+
+      // Upper Quarter
+      UQ[1] = (UF[1] + 3*M[1]) >> 2;
+      UQ[2] = (UF[2] + 3*M[2]) >> 2;
+      UQ[3] = (UF[3] + 3*M[3]) >> 2;
+      UQ[4] = (UF[4] + 3*M[4]) >> 2;
+      UQ[5] = (UF[5] + 3*M[5]) >> 2;
+
+      // Lower Quarter
+      LQ[1] = (LF[1] + 3*M[1]) >> 2;
+      LQ[2] = (LF[2] + 3*M[2]) >> 2;
+      LQ[3] = (LF[3] + 3*M[3]) >> 2;
+      LQ[4] = (LF[4] + 3*M[4]) >> 2;
+      LQ[5] = (LF[5] + 3*M[5]) >> 2;
+
+      vector_sad(SadCost   ,UF+1,CurP,5);
+      vector_sad(SadCost+ 5,UQ+1,CurP,5);
+      vector_sad(SadCost+10, M+1,CurP,5);
+      vector_sad(SadCost+15,LQ+1,CurP,5);
+      vector_sad(SadCost+20,LH+1,CurP,5);
     }
   }
 
-  return 0;
+  SmallestSad = SadCost[0];
+  SmallestSadI=0;
+
+  for(a=0;a<25;a++) {
+    if(SmallestSad > SadCost[a]) {
+      SmallestSad = SadCost[a];
+      SmallestSadI= a;
+    }
+
+/*    if((a%5) == 0)
+      cout << endl;
+
+    cout << setw(4) << SadCost[a];
+*/  }
+
+  Int Hor = (SmallestSadI%5)-2;
+  Int Ver = (SmallestSadI/5)-2;
+
+//  cout << endl << "Chosen SAD [" << SmallestSadI << "]: " << SmallestSad <<
+//  "@ (" << setw(2) << Hor << "," << setw(2) << Ver << ")" << endl;
+
+  mv = TComMv(Hor,Ver);
+
+  return SmallestSad;
 }
 
 Void TEncSearch::xPatternSearchFracDIF_hw(TComDataCU* pcCU,
@@ -4479,13 +4553,14 @@ Void TEncSearch::xPatternSearchFracDIF_hw(TComDataCU* pcCU,
   rcMvHalf = *pcMvInt;   rcMvHalf <<= 1;    // for mv-cost
   TComMv baseRefMv(0, 0);
 
-  cout << "dump block" << endl;
+//  cout << "dump block" << endl;
 
   if(pcPatternKey->getROIYWidth() != 8 || pcPatternKey->getROIYHeight() != 8) {
     cerr << "Invalid TU size" << endl;
     exit(-1);
   }
 
+/*
   dump_ref_block(pcPatternKey->getROIY(),
                  pcPatternKey->getROIYWidth(),
                  pcPatternKey->getROIYHeight(),
@@ -4497,7 +4572,12 @@ Void TEncSearch::xPatternSearchFracDIF_hw(TComDataCU* pcCU,
                  8,
                  m_cDistParam.iStrideCur*(1<<m_cDistParam.iSubShift)
                 );
+*/
 
+#define NEW_METHOD
+
+
+#ifdef NEW_METHOD
   TComMv pred_mv(0,0);
   UInt cost;
 
@@ -4506,7 +4586,7 @@ Void TEncSearch::xPatternSearchFracDIF_hw(TComDataCU* pcCU,
                    m_cDistParam.iStrideCur*(1<<m_cDistParam.iSubShift),
                    pred_mv
                   );
-  (void)cost;
+#endif
 
   ruiCost = xPatternRefinement_hw( pcPatternKey, baseRefMv, 2, rcMvHalf   );
   
@@ -4519,6 +4599,14 @@ Void TEncSearch::xPatternSearchFracDIF_hw(TComDataCU* pcCU,
   rcMvQter = *pcMvInt;   rcMvQter <<= 1;    // for mv-cost
   rcMvQter += rcMvHalf;  rcMvQter <<= 1;
   ruiCost = xPatternRefinement_hw( pcPatternKey, baseRefMv, 1, rcMvQter );
+
+#ifdef NEW_METHOD
+  rcMvHalf = TComMv(0,0);
+  rcMvQter = pred_mv;
+  ruiCost = cost;
+#endif
+//  cout << "Mv half  :" << setw(2) << rcMvHalf.getHor() << setw(2) << rcMvHalf.getVer() << endl;
+//  cout << "Mv chosen:" << setw(2) << rcMvQter.getHor() << setw(2) << rcMvQter.getVer() << endl;
 
 }
 
