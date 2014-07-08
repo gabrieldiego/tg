@@ -78,9 +78,6 @@ module frac_search(filter_pix, ref_pix, input_ready, mvx, mvy, clk, reset);
           next_state <= IDLE;
       end
       RECV: begin
-        mvx <= pix_counter[2:0];
-        mvy <= pix_counter[2:0]+2;
-
         if(input_ready) begin
 
           pix_counter <= pix_counter+1;
@@ -146,8 +143,11 @@ module frac_search(filter_pix, ref_pix, input_ready, mvx, mvy, clk, reset);
 
             next_state <= IDLE;
           end
-          else
+          else begin
             next_state <= RECV;
+            mvx = 0;
+            mvy = 0;
+          end
         end
       end
     endcase
