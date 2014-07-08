@@ -12,7 +12,7 @@ module frac_search(filter_pix, ref_pix, input_ready, mvx, mvy, clk, reset);
 
   wire clk, reset;
 
-  reg [63:0] pix_buffer;
+  reg [63:0] buffer_pix;
   reg [2:0] pix_counter;
 
   reg       state,next_state;
@@ -36,8 +36,10 @@ module frac_search(filter_pix, ref_pix, input_ready, mvx, mvy, clk, reset);
   wire [59:0] sad;
   reg  [9:0] sad_buffer[5:0];
   reg  [9:0] sad_sum[5:0];
+  reg  [9:0] sad_min[4:0];
+  reg  [2:0] vec_min[4:0];
 
-  compute_sad cs(filter_pix, ref_pix, input_ready, sad);
+  compute_sad cs(filter_pix, buffer_pix, ref_pix, input_ready, sad);
 
   assign {filter_array[7],filter_array[6],filter_array[5],
           filter_array[4],filter_array[3],filter_array[2],
@@ -57,7 +59,7 @@ module frac_search(filter_pix, ref_pix, input_ready, mvx, mvy, clk, reset);
     end
     else begin
       state <= next_state;
-      pix_buffer <= filter_pix;
+      buffer_pix <= filter_pix;
       for(i=0; i<=5; i=i+1 ) begin  
         sad_buffer[i] <= sad_sum[i];
       end
@@ -68,7 +70,6 @@ module frac_search(filter_pix, ref_pix, input_ready, mvx, mvy, clk, reset);
       IDLE: begin
         mvx <= 0;
         mvy <= 0;
-        pix_buffer <= filter_pix;
         pix_counter <= 0;
 
         if(input_ready)
@@ -87,9 +88,64 @@ module frac_search(filter_pix, ref_pix, input_ready, mvx, mvy, clk, reset);
           for(i=0; i<=5; i=i+1 ) begin
             sad_sum[i] <= sad_sum[i] + sad_buffer[i];
           end
+          if(pix_counter == 8'hF) begin
+            if(sad_sum[0] < sad_sum[1]) begin
+              sad_min[0] = sad_sum[0];
+              vec_min[0] = 0;
+            end
+            else begin
+              sad_min[0] = sad_sum[1];
+              vec_min[0] = 1;
+            end
 
-          if(pix_counter == 8'hF)
+            if(sad_sum[2] < sad_sum[3]) begin
+              sad_min[1] = sad_sum[2];
+              vec_min[1] = 2;
+            end
+            else begin
+              sad_min[1] = sad_sum[3];
+              vec_min[1] = 3;
+            end
+
+            if(sad_sum[4] < sad_sum[5]) begin
+              sad_min[2] = sad_sum[4];
+              vec_min[2] = 4;
+            end
+            else begin
+              sad_min[2] = sad_sum[5];
+              vec_min[2] = 5;
+            end
+
+            if(sad_min[0] < sad_min[1]) begin
+              sad_min[3] = sad_min[0];
+              vec_min[3] = vec_min[0];
+            end
+            else begin
+              sad_min[3] = sad_sum[1];
+              vec_min[3] = vec_min[1];
+            end
+
+            if(sad_min[2] < sad_min[3]) begin
+              sad_min[4] = sad_min[2];
+              vec_min[4] = vec_min[2];
+            end
+            else begin
+              sad_min[4] = sad_sum[3];
+              vec_min[4] = vec_min[3];
+            end
+
+            case (vec_min[4])
+              0: mvx = -2;
+              1: mvx = -1;
+              2: mvx = 0;
+              3: mvx = 1;
+              4: mvx = 2;
+            endcase
+
+            mvy = 0;
+
             next_state <= IDLE;
+          end
           else
             next_state <= RECV;
         end
