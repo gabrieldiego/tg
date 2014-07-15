@@ -1,7 +1,7 @@
 module compute_sad(filter_pix, buffer_pix, ref_pix, input_ready, sad);
   input [63:0] filter_pix;
   input [63:0] buffer_pix;
-  input [63:0] ref_pix;
+  input [55:8] ref_pix;
   input        input_ready;
 
   output [59:0] sad;
