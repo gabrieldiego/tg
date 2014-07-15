@@ -45,6 +45,7 @@
 #include <iomanip>
 
 using namespace std;
+void dump_ref_block(Pel *src, Int w, Int h, Int s);
 
 //! \ingroup TLibEncoder
 //! \{
@@ -778,6 +779,8 @@ UInt TEncSearch::xPatternRefinement_hw( TComPattern* pcPatternKey,
 //  cout << "rcDistParam.iCols: " << m_cDistParam.iCols << endl;
 //  cout << "pcPatternKey->getROIYWidth()" << pcPatternKey->getROIYWidth() << endl;
 
+//  DumpCUContents(pcPatternKey);
+
   const TComMv* pcMvRefine = (iFrac == 2 ? s_acMvRefineH : s_acMvRefineQ);
 
   for (UInt i = 0; i < 9; i++)
@@ -803,9 +806,18 @@ UInt TEncSearch::xPatternRefinement_hw( TComPattern* pcPatternKey,
 
     m_cDistParam.pCur = piRefPos;
     m_cDistParam.bitDepth = g_bitDepthY;
+
+//    cout << hex << (int)piRefPos << " " << piRefPos[0] << dec << endl;
+//    cout << horVal << "x" << verVal << endl;
+//    dump_ref_block(piRefPos,m_cDistParam.iCols,m_cDistParam.iRows,m_cDistParam.iStrideCur);
+
+//    UInt mvcost;
+
     uiDist = m_cDistParam.DistFunc( &m_cDistParam );
+//    cout << "uiDist: " << uiDist << endl; 
+//    mvcost = uiDist;
     uiDist += m_pcRdCost->getCost( cMvTest.getHor(), cMvTest.getVer() );
-//    cout << "uiDist: " << uiDist << endl;
+//    cout << "mvcost: " << uiDist - mvcost << endl;
 
     if ( uiDist < uiDistBest )
     {
@@ -4407,12 +4419,13 @@ Void filter_line(Pel *Line, Pel *Org, Int Step) {
 }
 
 Void vector_sad(UInt *res, Pel *vector, Pel pixel, Int len) {
-  for( ; len>0; len--) {
-    res[len-1] += abs(vector[len-1]-pixel);
+  Int a;
+  for(a=0 ; a<len; a++) {
+    res[a] += abs(vector[a]-pixel);
   }
 }
 
-UInt refine_mv(Pel *Cur, Pel *Org, Int StrideCur, Int StrideOrg, TComMv& mv) {
+UInt refine_mv(Pel *Org, Pel *Cur, Int StrideOrg, Int StrideCur, TComMv& mv) {
   Int a,b;
   Int h=8,w=8;
   Pel UF[7],UH[7],UQ[7],M[7],LQ[7],LH[7],LF[7];
@@ -4439,15 +4452,24 @@ UInt refine_mv(Pel *Cur, Pel *Org, Int StrideCur, Int StrideOrg, TComMv& mv) {
   // x --> Fractional pixel positions
   // + --> Fractional pixel positions that are needed to calculate some 'x'
 
-  memset(SadCost,0,sizeof(SadCost));
+  for(a=0;a<25;a++) {
+    SadCost[a] = 0;
+  }
+
+  // Avança uma linha antes
+  Org+=StrideOrg;
+  Cur+=StrideCur;
 
   for(a=1; a<h-1; a++) {
-    for(b=1; b<w-1; b++) {
-      Pel CurP = Cur[a*StrideCur+b];
+    Org++; // Avança uma coluna
+    Cur++;
 
-      filter_line(M, Org +   a * StrideOrg + b,1);
-      filter_line(UF,Org +(a-1)* StrideOrg + b,1);
-      filter_line(LF,Org +(a+1)* StrideOrg + b,1);
+    for(b=1; b<w-1; b++) {
+      Pel OrgP = Org[0];
+
+      filter_line(M, Cur          ,1);
+      filter_line(UF,Cur-StrideCur,1);
+      filter_line(LF,Cur+StrideCur,1);
 
       // Upper Half
       UH[0] = (UF[0] + M[0]) >> 1;
@@ -4483,12 +4505,17 @@ UInt refine_mv(Pel *Cur, Pel *Org, Int StrideCur, Int StrideOrg, TComMv& mv) {
       LQ[4] = (LF[4] + 3*M[4]) >> 2;
       LQ[5] = (LF[5] + 3*M[5]) >> 2;
 
-      vector_sad(SadCost   ,UF+1,CurP,5);
-      vector_sad(SadCost+ 5,UQ+1,CurP,5);
-      vector_sad(SadCost+10, M+1,CurP,5);
-      vector_sad(SadCost+15,LQ+1,CurP,5);
-      vector_sad(SadCost+20,LH+1,CurP,5);
+      vector_sad(SadCost   ,UF+1,OrgP,5);
+      vector_sad(SadCost+ 5,UQ+1,OrgP,5);
+      vector_sad(SadCost+10, M+1,OrgP,5);
+      vector_sad(SadCost+15,LQ+1,OrgP,5);
+      vector_sad(SadCost+20,LH+1,OrgP,5);
+      Org++;
+      Cur++;
     }
+
+    Org+=StrideOrg-7;
+    Cur+=StrideCur-7;
   }
 
   SmallestSad = SadCost[0];
@@ -4499,18 +4526,10 @@ UInt refine_mv(Pel *Cur, Pel *Org, Int StrideCur, Int StrideOrg, TComMv& mv) {
       SmallestSad = SadCost[a];
       SmallestSadI= a;
     }
-
-/*    if((a%5) == 0)
-      cout << endl;
-
-    cout << setw(4) << SadCost[a];
-*/  }
+  }
 
   Int Hor = (SmallestSadI%5)-2;
   Int Ver = (SmallestSadI/5)-2;
-
-//  cout << endl << "Chosen SAD [" << SmallestSadI << "]: " << SmallestSad <<
-//  "@ (" << setw(2) << Hor << "," << setw(2) << Ver << ")" << endl;
 
   mv = TComMv(Hor,Ver);
 
@@ -4553,37 +4572,22 @@ Void TEncSearch::xPatternSearchFracDIF_hw(TComDataCU* pcCU,
   rcMvHalf = *pcMvInt;   rcMvHalf <<= 1;    // for mv-cost
   TComMv baseRefMv(0, 0);
 
-//  cout << "dump block" << endl;
-
   if(pcPatternKey->getROIYWidth() != 8 || pcPatternKey->getROIYHeight() != 8) {
     cerr << "Invalid TU size" << endl;
     exit(-1);
   }
 
-/*
-  dump_ref_block(pcPatternKey->getROIY(),
-                 pcPatternKey->getROIYWidth(),
-                 pcPatternKey->getROIYHeight(),
-                 pcPatternKey->getPatternLStride()
-                );
-
-  dump_ref_block(m_cDistParam.pCur,
-                 8,
-                 8,
-                 m_cDistParam.iStrideCur*(1<<m_cDistParam.iSubShift)
-                );
-*/
-
-#define NEW_METHOD
+//#define NEW_METHOD
 
 
 #ifdef NEW_METHOD
   TComMv pred_mv(0,0);
   UInt cost;
 
-  cost = refine_mv(pcPatternKey->getROIY(),m_cDistParam.pCur,
-                   pcPatternKey->getPatternLStride(),
-                   m_cDistParam.iStrideCur*(1<<m_cDistParam.iSubShift),
+  cost = refine_mv(m_cDistParam.pOrg,
+                   m_filteredBlock[0][0].getLumaAddr(),
+                   m_cDistParam.iStrideOrg*(1<<m_cDistParam.iSubShift),
+                   m_filteredBlock[0][0].getStride(),
                    pred_mv
                   );
 #endif
@@ -4601,6 +4605,10 @@ Void TEncSearch::xPatternSearchFracDIF_hw(TComDataCU* pcCU,
   ruiCost = xPatternRefinement_hw( pcPatternKey, baseRefMv, 1, rcMvQter );
 
 #ifdef NEW_METHOD
+
+//  cout << "Mv original:" << setw(2) << rcMvQter.getHor() << setw(2) << rcMvQter.getVer() << endl;
+//  cout << "Mv new     :" << setw(2) << pred_mv.getHor() << setw(2) << pred_mv.getVer() << endl << endl;
+
   rcMvHalf = TComMv(0,0);
   rcMvQter = pred_mv;
   ruiCost = cost;
