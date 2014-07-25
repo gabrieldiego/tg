@@ -1,40 +1,128 @@
-module compute_sad(filter_pix, buffer_pix, ref_pix, input_ready, sad);
-  input [63:0] filter_pix;
-  input [63:0] buffer_pix;
-  input [55:8] ref_pix;
-  input        input_ready;
+module compute_sad(cur_upper_pix, cur_middle_pix, cur_lower_pix,
+                   org_pix, sad_uq, sad_uh, sad_middle, sad_lh, sad_lq);
+  input [63:0] cur_upper_pix;
+  input [63:0] cur_middle_pix;
+  input [63:0] cur_lower_pix;
+  input [63:0] org_pix;
 
-  output [59:0] sad;
-//  output [59:0] sad2;
-//  output [59:0] sad3;
+  output [59:0] sad_uq;
+  output [59:0] sad_uh;
+  output [59:0] sad_middle;
+  output [59:0] sad_lh;
+  output [59:0] sad_lq;
   // 12 bits for each result sad the difference of each pixel is 9 bits wide
   // and there are 6 integers of 9 bits to add, thus we use 3 extra bits.
 
-  /*
-   The SAD will be calculated only in the horizontal direction 
-   for all five possible locations in this direction:
-   Right Half, Right Quarter, Full, Left Quarter, Left Half
-   
-   The Half and Quarter subsamples will be only computed where there are pixels
-   to their left and right (which excludes the samples that are outside the block)
-   */
+  // Follow the next diagram:
+  // f   h q f q h   f <-- Index
+  //
+  // o   + + o + +   o <-- UF = Upper Full
+  //
+  // +   x x x x x   + <-- UH = Upper Half
+  //     x x x x x     <-- UQ = Upper Quarter
+  // o   x x o x x   o <-- M  = Middle
+  //     x x x x x     <-- LQ = Lower Quarter
+  // +   x x x x x   + <-- LH = Lower Half
+  //
+  // o   + + o + +   o <-- LF = Lower Full
+  //
+  // o --> Full pixel positions
+  // x --> Fractional pixel positions
+  // + --> Fractional pixel positions that are needed to calculate some 'x'
 
-  /* Follow this rule to the index of the arrays:
-   H -> hpel -> half pixel sample
-   Q -> qpel -> quarter pixel sample
-   F -> full -> full pixel
-   
-   Sample: FQHQ FQHQ FQHQ FQHQ FQHQ FQHQ FQHQ F
-   Index:  0001 1213 2425 3637 4849 5151 6161 7
-                                     0 1  2 3
 
-   The interpolation to be used is linear: H[i] = (F[i] + F[i+1]) / 2
-   */
-
-  wire [7:0]      filter_array[7:0]; // Can't use vector as input, so we declare as a wire
+  wire [7:0]      filter_array[7:0];
+  // Can't use vector as input, so we declare as a wire
   wire [7:0]      buffer_array[7:0];
   wire [7:0]      ref_array[7:0];
   wire [11:0]     sad_array[4:0];
+
+  wire            UF_h[55:0];            
+  wire            UF_q[111:0];
+
+  wire            M_h[55:0];            
+  wire            M_q[111:0];
+
+  wire            LF_h[55:0];            
+  wire            LF_q[111:0];
+
+  filter_half    fh(cur_upper_pix,UF_h);
+  filter_quarter fq(cur_upper_pix,UF_q);
+
+  filter_half    fh(cur_middle_pix,M_h);
+  filter_quarter fq(cur_middle_pix,M_q);
+
+  filter_half    fh(cur_lower_pix,LF_h);
+  filter_quarter fq(cur_lower_pix,LF_q);
+
+  wire            UH_f[63:0];
+  wire            LH_f[63:0];
+
+  genvar          i;
+  generate
+    for(i=0;i<64;i+=8) begin
+      UH_f[i+7:i] = (cur_upper_pix[i+7:i] + cur_middle_pix[i+7:i]) >> 1;
+      LH_f[i+7:i] = (cur_lower_pix[i+7:i] + cur_middle_pix[i+7:i]) >> 1;
+    end
+  endgenerate
+
+  wire            UH_h[55:0];
+  wire            LH_h[55:0];
+
+  generate
+    for(i=0;i<56;i+=8) begin
+      UH_h[i+7:i] = (UF_h[i+7:i] + M_h[i+7:i]) >> 1;
+      LH_h[i+7:i] = (LF_h[i+7:i] + M_h[i+7:i]) >> 1;
+    end
+  endgenerate
+
+  wire            UH_q[111:0];
+  wire            LH_q[111:0];
+
+  generate
+    for(i=0;i<56;i+=8) begin
+      UH_q[2*i+ 7:2*i  ] = (UH_f[i+ 7:i   ] + 3*UH_f[i+15:i+8]) >> 2;
+      UH_q[2*i+15:2*i+8] = (UH_f[i+23:i+16] + 3*UH_f[i+15:i+8]) >> 2;
+
+      LH_q[2*i+ 7:2*i  ] = (LH_f[i+ 7:i   ] + 3*LH_f[i+15:i+8]) >> 2;
+      LH_q[2*i+15:2*i+8] = (LH_f[i+23:i+16] + 3*LH_f[i+15:i+8]) >> 2;
+    end
+  endgenerate
+
+  wire            UQ_h[55:0];
+  wire            LQ_h[55:0];
+  wire            UQ_q[111:0];
+  wire            LQ_q[111:0];
+
+  generate
+    for(i=0;i<56;i+=8) begin
+      UQ_h[i+7:i] = (UF_h[i+7:i] + 3*M_h[i+7:i]) >> 2;
+      LQ_h[i+7:i] = (LF_h[i+7:i] + 3*M_h[i+7:i]) >> 2;
+
+      UQ_q[2*i+ 7:2*i  ] = (UF_q[2*i+ 7:2*i  ] + 3*M_q[2*i+ 7:2*i  ]) >> 2;
+      UQ_q[2*i+15:2*i+8] = (UF_q[2*i+15:2*i+8] + 3*M_q[2*i+15:2*i+8]) >> 2;
+
+      LQ_q[2*i+ 7:2*i  ] = (LF_q[2*i+ 7:2*i  ] + 3*M_q[2*i+ 7:2*i  ]) >> 2;
+      LQ_q[2*i+15:2*i+8] = (LF_q[2*i+15:2*i+8] + 3*M_q[2*i+15:2*i+8]) >> 2;
+    end
+  endgenerate
+
+
+/*
+  generate
+    for(i=1; i<=6; i=i+1) begin: abs_diff_generate
+      abs_diff ad5(qpel[2*i-1],    ref_array[i], diff_left_quarter[i] );
+      abs_diff ad4(hpel[i-1],      ref_array[i], diff_left_half[i]    );
+      abs_diff ad3(filter_array[i],ref_array[i], diff_full_pixel[i]   );
+      abs_diff ad2(hpel[i],        ref_array[i], diff_right_half[i]   );
+      abs_diff ad1(qpel[2*i],      ref_array[i], diff_right_quarter[i]);
+    end
+  endgenerate
+
+
+
+
+
 
   assign {filter_array[7],filter_array[6],filter_array[5],filter_array[4],
           filter_array[3],filter_array[2],filter_array[1],filter_array[0]} = filter_pix;
@@ -57,7 +145,6 @@ module compute_sad(filter_pix, buffer_pix, ref_pix, input_ready, sad);
   wire [7:0]      hpelq[6:0];
   wire [7:0]      qpelq[13:0];
 
-  genvar          i;
   generate
     for(i=0; i<=6; i=i+1) begin: hpel_generate
       assign hpel[i] = (filter_array[i] + filter_array[i+1])/2;
@@ -118,5 +205,5 @@ module compute_sad(filter_pix, buffer_pix, ref_pix, input_ready, sad);
   assign sad_array[0] = diff_right_quarter[1]+diff_right_quarter[2]+
                         diff_right_quarter[3]+diff_right_quarter[4]+
                         diff_right_quarter[5]+diff_right_quarter[6];
-
+*/
 endmodule
