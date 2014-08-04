@@ -18,11 +18,9 @@ module abs_diff_line_tb;
   reg [63:0] cur_lower_pix;
   reg [63:0] org_pix;
 
-  wire [7:0]   cur_array[7:0];
-  wire [7:0]   org_array[7:0];
-
-  assign {cur_array[7],cur_array[6],cur_array[5],cur_array[4],
-          cur_array[3],cur_array[2],cur_array[1],cur_array[0]} = cur_lower_pix;
+  reg [7:0]   cur_m_array[7:0];
+  reg [7:0]   cur_array[7:0];
+  wire [7:0]  org_array[7:0];
 
   assign {org_array[7],org_array[6],org_array[5],org_array[4],
           org_array[3],org_array[2],org_array[1],org_array[0]} = org_pix;
@@ -61,16 +59,22 @@ module abs_diff_line_tb;
       if(c != 1) begin
         $finish;
       end
-      cur_middle_array[i+7:i] = tmp;
+      cur_m_array[i] = tmp;
     end
+
+  cur_middle_pix = {cur_m_array[7],cur_m_array[6],cur_m_array[5],cur_m_array[4],
+                    cur_m_array[3],cur_m_array[2],cur_m_array[1],cur_m_array[0]};
 
     for(i=0;i<64;i=i+8) begin
       c = $fscanf(input_file,"%x",tmp);
       if(c != 1) begin
         $finish;
       end
-      cur_lower_array[i+7:i] = tmp;
+      cur_array[i] = tmp;
     end
+
+    cur_lower_pix = {cur_array[7],cur_array[6],cur_array[5],cur_array[4],
+                     cur_array[3],cur_array[2],cur_array[1],cur_array[0]};
   end
 
   initial begin
@@ -93,6 +97,7 @@ module abs_diff_line_tb;
       cur_array[i] = tmp;
     end
 
+/*
     #1 for(i=0;i<7;i=i+1) begin
       $write("%2x ",half_array[i]);
     end
@@ -101,7 +106,7 @@ module abs_diff_line_tb;
     for(i=0;i<14;i=i+1) begin
       $write("%2x ",quarter_array[i]);
     end
-    $write("\n");
+    $write("\n");*/
 
   end
 
