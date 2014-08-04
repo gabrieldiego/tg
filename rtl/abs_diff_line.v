@@ -143,11 +143,11 @@ module abs_diff_line(cur_upper_pix, cur_middle_pix, cur_lower_pix, org_pix,
       abs_diff ad_UQ_f(org_pix[i+7 :i  ],UQ_h[  i+7 :  i  ],diff_UQ_f[  i +7:  i  ]);
 
 
-      abs_diff ad_M_h(org_pix[i+ 7:i  ],M_h[  i+ 7:  i  ],diff_M_h[2*i+ 7:2*i  ]);
-      abs_diff ad_M_i(org_pix[i+15:i+8],M_h[  i+15:  i+8],diff_M_h[2*i+15:2*i+8]);
-      abs_diff ad_M_q(org_pix[i+ 7:i  ],M_q[2*i+ 7:2*i  ],diff_M_q[2*i+ 7:2*i  ]);
-      abs_diff ad_M_r(org_pix[i+15:i+8],M_q[2*i+15:2*i+8],diff_M_q[2*i+15:2*i+8]);
-      abs_diff ad_M_f(org_pix[i+7:i],cur_middle_pix[i+7:i],diff_M_f[ i+ 7:  i  ]);
+      abs_diff ad_M_h(org_pix[i+ 7:i  ], M_h[  i+ 7:  i  ], diff_M_h[2*i+ 7:2*i  ]);
+      abs_diff ad_M_i(org_pix[i+15:i+8], M_h[  i+15:  i+8], diff_M_h[2*i+15:2*i+8]);
+      abs_diff ad_M_q(org_pix[i+ 7:i  ], M_q[2*i+ 7:2*i  ], diff_M_q[2*i+ 7:2*i  ]);
+      abs_diff ad_M_r(org_pix[i+15:i+8], M_q[2*i+15:2*i+8], diff_M_q[2*i+15:2*i+8]);
+      abs_diff ad_M_f(org_pix[i+15:i+8],cur_middle_pix[i+15:i+8],diff_M_f[i+7:i  ]);
 
 
       abs_diff ad_LQ_h(org_pix[i+ 7:i  ],LQ_h[  i+ 7:  i  ],diff_LQ_h[2*i+ 7:2*i  ]);

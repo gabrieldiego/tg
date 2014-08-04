@@ -6,9 +6,12 @@ module abs_diff_line_tb;
 
   parameter prefix="/home/gabriel/Dev/tg/rtl/";
   parameter filename="abs_diff_line.txt";
+  parameter filename_org="abs_diff_line_org.txt";
   parameter filepath={prefix,filename};
+  parameter filepath_org={prefix,filename_org};
 
   integer    input_file;
+  integer    org_file;
   integer    i,c,tmp;
 
   reg        clk;
@@ -18,13 +21,8 @@ module abs_diff_line_tb;
   reg [63:0] cur_lower_pix;
   reg [63:0] org_pix;
 
-  reg [7:0]   cur_m_array[7:0];
   reg [7:0]   cur_array[7:0];
-  wire [7:0]  org_array[7:0];
-
-  assign {org_array[7],org_array[6],org_array[5],org_array[4],
-          org_array[3],org_array[2],org_array[1],org_array[0]} = org_pix;
-
+  reg [7:0]   org_array[7:0];
 
   wire [111:0] diff_UH_h;
   wire [111:0] diff_UH_q;
@@ -54,18 +52,24 @@ module abs_diff_line_tb;
       $finish;
     end
 
-    for(i=0;i<64;i=i+8) begin
+    org_file = $fopen(filepath_org, "r");
+    if (org_file == `NULL) begin
+      $display({"Cannot open file ",filepath_org});
+      $finish;
+    end
+
+    for(i=0;i<8;i=i+1) begin
       c = $fscanf(input_file,"%x",tmp);
       if(c != 1) begin
         $finish;
       end
-      cur_m_array[i] = tmp;
+      cur_array[i] = tmp;
     end
 
-  cur_middle_pix = {cur_m_array[7],cur_m_array[6],cur_m_array[5],cur_m_array[4],
-                    cur_m_array[3],cur_m_array[2],cur_m_array[1],cur_m_array[0]};
+    cur_middle_pix = {cur_array[7],cur_array[6],cur_array[5],cur_array[4],
+                     cur_array[3],cur_array[2],cur_array[1],cur_array[0]};
 
-    for(i=0;i<64;i=i+8) begin
+    for(i=0;i<8;i=i+1) begin
       c = $fscanf(input_file,"%x",tmp);
       if(c != 1) begin
         $finish;
@@ -97,6 +101,20 @@ module abs_diff_line_tb;
       cur_array[i] = tmp;
     end
 
+    cur_lower_pix = {cur_array[7],cur_array[6],cur_array[5],cur_array[4],
+                     cur_array[3],cur_array[2],cur_array[1],cur_array[0]};
+
+    for(i=0;i<8;i=i+1) begin
+      c = $fscanf(org_file,"%x",tmp);
+      if(c != 1) begin
+        $finish;
+      end
+      org_array[i] = tmp;
+    end
+
+    org_pix = {org_array[7],org_array[6],org_array[5],org_array[4],
+               org_array[3],org_array[2],org_array[1],org_array[0]};
+
 /*
     #1 for(i=0;i<7;i=i+1) begin
       $write("%2x ",half_array[i]);
@@ -119,7 +137,7 @@ module abs_diff_line_tb;
 
   initial begin
     $dumpfile("abs_diff_line.vcd");
-    $dumpvars(0,abl);
+    $dumpvars(0,abs_diff_line_tb);
   end
 
 endmodule
