@@ -2,90 +2,103 @@
 `define NULL 0
 
 module frac_search_tb;
-
-  reg [7:0] in=0;
-  reg reset=0;
-
-  reg         input_ready;
-
-  integer tmp;
-  integer c;
-  integer i;
-
   parameter STDIN = 32'h8000_0000;
 
-  wire [2:0] mvx, mvy;
+  parameter     prefix="/home/gabriel/Dev/tg/rtl/";
+  parameter     filename_cur="frac_search_cur.txt";
+  parameter     filename_org="frac_search_org.txt";
+  parameter     filepath_cur={prefix,filename_cur};
+  parameter     filepath_org={prefix,filename_org};
 
-  reg [7:0] filter_array[7:0];
-  reg [7:0] ref_array[7:0];
+  integer       cur_file;
+  integer       org_file;
+  integer       i,c,tmp;
 
-  wire [63:0] filter_pix;
-  wire [63:0] ref_pix;
+  reg           clk, reset;
 
-  reg        clk =0;
+  reg [63:0]    cur_pix;
+  reg [55:8]    org_pix;
+  reg           ready;
 
-  integer    input_file;
+  wire [11:0] sad_out;
+  wire [2:0]  mvx;
+  wire [2:0]  mvy;
 
-  assign filter_pix =
-    {filter_array[7],filter_array[6],filter_array[5],filter_array[4],
-     filter_array[3],filter_array[2],filter_array[1],filter_array[0]};
-
-  assign ref_pix = {ref_array[7],ref_array[6],ref_array[5],ref_array[4],
-                    ref_array[3],ref_array[2],ref_array[1],ref_array[0]};
+  reg [7:0]   cur_array[7:0];
+  reg [7:0]   org_array[7:0];
 
   initial begin
-    input_file = $fopen("/home/gabriel/Dev/tg/rtl/test.txt", "r");
-    if (input_file == `NULL) begin
-      $display("input_file handle was NULL");
+    cur_file = $fopen(filepath_cur, "r");
+    if (cur_file == `NULL) begin
+      $display({"Cannot open file ",filepath_cur});
       $finish;
     end
 
-    @(posedge clk) begin
-      reset = 1;
-      input_ready = 0;
-    end
-
-    @(negedge clk) begin
-      reset = 0;
-      input_ready = 0;
-    end
-
-    forever begin
-      @(posedge clk) begin
-        for(i=0; i<8; i=i+1) begin
-          c = $fscanf(input_file,"%x",tmp);
-          if(c != 1)
-            $finish;
-
-          filter_array[i] = tmp;
-        end
-
-        for(i=0; i<8; i=i+1) begin
-          c = $fscanf(input_file,"%x",tmp);
-          if(c != 1) begin
-            @(posedge clk) // Wait for last clock tick
-            $finish;
-          end
-
-          ref_array[i] = tmp;
-        end
-
-        input_ready <= 1;
-
-      end
+    org_file = $fopen(filepath_org, "r");
+    if (org_file == `NULL) begin
+      $display({"Cannot open file ",filepath_org});
+      $finish;
     end
   end
 
-  frac_search fs(filter_pix,ref_pix,input_ready,mvx,mvy,clk,reset);
-
-  always #10 clk = !clk;
-
-  initial
-    $monitor("At time %t value %d %d",$time,mvx,mvy);
+  initial begin
+    clk = 0;
+    i = 0;
+    forever begin
+      clk = #10 ~clk;
+    end
+  end
 
   initial begin
-    $dumpfile("test.vcd");
-    $dumpvars(0,fs);
+    ready = 0;
+
+    @(negedge clk) reset = 1;
+    @(negedge clk) reset = 0;
+
+    forever @(negedge clk) begin
+      ready = 1;
+
+      for(i=0;i<8;i=i+1) begin
+        c = $fscanf(cur_file,"%x",tmp);
+        if(c != 1) begin
+          $finish;
+        end
+        cur_array[i] = tmp;
+      end
+
+      cur_pix = {cur_array[7],cur_array[6],cur_array[5],cur_array[4],
+                 cur_array[3],cur_array[2],cur_array[1],cur_array[0]};
+
+      for(i=0;i<8;i=i+1) begin
+        $write("%x ",cur_array[i]);
+      end
+      $write("\n\n");
+
+      for(i=0;i<8;i=i+1) begin
+        c = $fscanf(org_file,"%x",tmp);
+        if(c != 1) begin
+          $finish;
+        end
+        org_array[i] = tmp;
+      end
+
+      org_pix = {org_array[6],org_array[5],org_array[4],
+                 org_array[3],org_array[2],org_array[1]};
+
+      for(i=0;i<8;i=i+1) begin
+        $write("%x ",org_array[i]);
+      end
+      $write("\n\n");
+
+      #1 $write("%4d %d %d\n", sad_out, mvx, mvy);
+    end
+  end
+
+  frac_search fs(cur_pix, org_pix, ready, sad_out, mvx, mvy, clk, reset);
+
+  initial begin
+    $dumpfile("frac_search.vcd");
+    $dumpvars(0,frac_search_tb);
   end
 
 endmodule

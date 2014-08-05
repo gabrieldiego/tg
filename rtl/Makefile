@@ -7,6 +7,9 @@ abs_diff_line: abs_diff_line_tb.v abs_diff_line.v abs_diff.v filter_half.v filte
 compute_sad: compute_sad_tb.v abs_diff_line.v abs_diff.v filter_half.v filter_quarter.v compute_sad.v sad.v
 	iverilog -o $@ $^
 
+frac_search:  frac_search_tb.v frac_search.v abs_diff_line.v abs_diff.v filter_half.v filter_quarter.v compute_sad.v sad.v
+	iverilog -o $@ $^
+
 %: %_tb.v $(RTL)
 	iverilog -o $@ $^
 
