@@ -3,7 +3,7 @@ module compute_sad(cur_upper_pix, cur_middle_pix, cur_lower_pix, org_pix,
   input [63:0] cur_upper_pix;
   input [63:0] cur_middle_pix;
   input [63:0] cur_lower_pix;
-  input [63:0] org_pix;
+  input [55:8] org_pix;
 
   output [59:0] sad_UH;
   output [59:0] sad_UQ;

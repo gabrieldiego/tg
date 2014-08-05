@@ -8,7 +8,7 @@ module abs_diff_line(cur_upper_pix, cur_middle_pix, cur_lower_pix, org_pix,
   input [63:0] cur_upper_pix;
   input [63:0] cur_middle_pix;
   input [63:0] cur_lower_pix;
-  input [63:0] org_pix;
+  input [55:8] org_pix;
 
   output [47:0] diff_UH_h;
   output [47:0] diff_UH_q;

@@ -19,7 +19,7 @@ module abs_diff_line_tb;
   reg [63:0] cur_upper_pix;
   reg [63:0] cur_middle_pix;
   reg [63:0] cur_lower_pix;
-  reg [63:0] org_pix;
+  reg [55:8] org_pix;
 
   reg [7:0]   cur_array[7:0];
   reg [7:0]   org_array[7:0];

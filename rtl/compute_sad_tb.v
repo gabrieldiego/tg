@@ -19,7 +19,7 @@ module compute_sad_tb;
   reg [63:0] cur_upper_pix;
   reg [63:0] cur_middle_pix;
   reg [63:0] cur_lower_pix;
-  reg [63:0] org_pix;
+  reg [55:8] org_pix;
 
   reg [7:0]   cur_array[7:0];
   reg [7:0]   org_array[7:0];
@@ -124,8 +124,8 @@ module compute_sad_tb;
       org_array[i] = tmp;
     end
 
-    org_pix = {org_array[7],org_array[6],org_array[5],org_array[4],
-               org_array[3],org_array[2],org_array[1],org_array[0]};
+    org_pix = {org_array[6],org_array[5],org_array[4],
+               org_array[3],org_array[2],org_array[1]};
 
     for(i=0;i<8;i=i+1) begin
       $write("%x ",org_array[i]);
@@ -134,7 +134,6 @@ module compute_sad_tb;
 
     #1 $write("%3d %3d %3d %3d %3d\n", sad_M[11: 0], sad_M[23:12],
                          sad_M[35:24], sad_M[47:36], sad_M[59:48]);
-
   end
 
   compute_sad cs(cur_upper_pix, cur_middle_pix, cur_lower_pix, org_pix,
