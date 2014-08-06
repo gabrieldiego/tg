@@ -99,8 +99,8 @@ module abs_diff_line(cur_upper_pix, cur_middle_pix, cur_lower_pix, org_pix,
   genvar          i;
   generate
     for(i=0; i<64; i=i+8) begin: UH_LH_f_gen
-      assign UH_f[i+7:i] = (cur_upper_pix[i+7:i] + cur_middle_pix[i+7:i]) >> 1;
-      assign LH_f[i+7:i] = (cur_lower_pix[i+7:i] + cur_middle_pix[i+7:i]) >> 1;
+      assign UH_f[i+7:i] = (cur_upper_pix[i+7:i] + cur_middle_pix[i+7:i]) / 2;
+      assign LH_f[i+7:i] = (cur_lower_pix[i+7:i] + cur_middle_pix[i+7:i]) / 2;
     end
   endgenerate
 
@@ -109,8 +109,8 @@ module abs_diff_line(cur_upper_pix, cur_middle_pix, cur_lower_pix, org_pix,
 
   generate
     for(i=0;i<56;i=i+8) begin: UH_LH_h_gen
-      assign UH_h[i+7:i] = (UF_h[i+7:i] + M_h[i+7:i]) >> 1;
-      assign LH_h[i+7:i] = (LF_h[i+7:i] + M_h[i+7:i]) >> 1;
+      assign UH_h[i+7:i] = (UF_h[i+7:i] + M_h[i+7:i]) / 2;
+      assign LH_h[i+7:i] = (LF_h[i+7:i] + M_h[i+7:i]) / 2;
     end
   endgenerate
 
@@ -119,11 +119,11 @@ module abs_diff_line(cur_upper_pix, cur_middle_pix, cur_lower_pix, org_pix,
 
   generate
     for(i=0;i<48;i=i+8) begin: UH_LH_q_gen
-      assign UH_q[2*i+ 7:2*i  ] = (UH_f[i+ 7:i   ] + 3*UH_f[i+15:i+8]) >> 2;
-      assign UH_q[2*i+15:2*i+8] = (UH_f[i+23:i+16] + 3*UH_f[i+15:i+8]) >> 2;
+      assign UH_q[2*i+ 7:2*i  ] = (UH_f[i+ 7:i   ] + 3*UH_f[i+15:i+8]) / 4;
+      assign UH_q[2*i+15:2*i+8] = (UH_f[i+23:i+16] + 3*UH_f[i+15:i+8]) / 4;
 
-      assign LH_q[2*i+ 7:2*i  ] = (LH_f[i+ 7:i   ] + 3*LH_f[i+15:i+8]) >> 2;
-      assign LH_q[2*i+15:2*i+8] = (LH_f[i+23:i+16] + 3*LH_f[i+15:i+8]) >> 2;
+      assign LH_q[2*i+ 7:2*i  ] = (LH_f[i+ 7:i   ] + 3*LH_f[i+15:i+8]) / 4;
+      assign LH_q[2*i+15:2*i+8] = (LH_f[i+23:i+16] + 3*LH_f[i+15:i+8]) / 4;
     end
   endgenerate
 
@@ -133,8 +133,8 @@ module abs_diff_line(cur_upper_pix, cur_middle_pix, cur_lower_pix, org_pix,
 
   generate
     for(i=0;i<48;i=i+8) begin: UQ_LQ_f_gen
-      assign UQ_f[i+7:i]=(cur_upper_pix[i+15:i+8]+cur_middle_pix[i+15:i]+8)>>1;
-      assign LQ_f[i+7:i]=(cur_lower_pix[i+15:i+8]+cur_middle_pix[i+15:i+8])>>1;
+      assign UQ_f[i+7:i]=(cur_upper_pix[i+15:i+8]+cur_middle_pix[i+15:i]+8)/2;
+      assign LQ_f[i+7:i]=(cur_lower_pix[i+15:i+8]+cur_middle_pix[i+15:i+8])/2;
     end
   endgenerate
 
@@ -143,8 +143,8 @@ module abs_diff_line(cur_upper_pix, cur_middle_pix, cur_lower_pix, org_pix,
 
   generate
     for(i=0;i<56;i=i+8) begin: UQ_LQ_h_gen
-      assign UQ_h[i+7:i] = (UF_h[i+7:i] + 3*M_h[i+7:i]) >> 2;
-      assign LQ_h[i+7:i] = (LF_h[i+7:i] + 3*M_h[i+7:i]) >> 2;
+      assign UQ_h[i+7:i] = (UF_h[i+7:i] + 3*M_h[i+7:i]) / 4;
+      assign LQ_h[i+7:i] = (LF_h[i+7:i] + 3*M_h[i+7:i]) / 4;
     end
   endgenerate
 
@@ -156,27 +156,27 @@ module abs_diff_line(cur_upper_pix, cur_middle_pix, cur_lower_pix, org_pix,
 
   generate
     for(i=0;i<48;i=i+8) begin: UQ_LQ_q_gen
-      assign UQ_q[i+7:i] = (UF_q[2*i+ 7:2*i  ] + 3*M_q[2*i+7:2*i]) >> 2;
-      assign UQ_r[i+7:i] = (UF_q[2*i+15:2*i+8] + 3*M_q[2*i+7:2*i]) >> 2;
+      assign UQ_q[i+7:i] = (UF_q[2*i+ 7:2*i  ] + 3*M_q[2*i+7:2*i]) / 4;
+      assign UQ_r[i+7:i] = (UF_q[2*i+15:2*i+8] + 3*M_q[2*i+7:2*i]) / 4;
 
-      assign LQ_q[i+7:i] = (LF_q[2*i+ 7:2*i  ] + 3*M_q[2*i+7:2*i]) >> 2;
-      assign LQ_q[i+7:i] = (LF_q[2*i+15:2*i+8] + 3*M_q[2*i+7:2*i]) >> 2;
+      assign LQ_q[i+7:i] = (LF_q[2*i+ 7:2*i  ] + 3*M_q[2*i+7:2*i]) / 4;
+      assign LQ_r[i+7:i] = (LF_q[2*i+15:2*i+8] + 3*M_q[2*i+7:2*i]) / 4;
     end
   endgenerate
 
   generate
     for(i=0; i<48; i=i+8) begin: abs_diff_generate
-      abs_diff ad_UH_h(org_pix[i+15:i+8],UH_h[  i+ 7:  i  ],diff_UH_h[i+7:i]);
-      abs_diff ad_UH_i(org_pix[i+15:i+8],UH_h[  i+15:  i+8],diff_UH_i[i+7:i]);
-      abs_diff ad_UH_q(org_pix[i+15:i+8],UH_q[2*i+ 7:2*i  ],diff_UH_q[i+7:i]);
-      abs_diff ad_UH_r(org_pix[i+15:i+8],UH_q[2*i+15:2*i+8],diff_UH_r[i+7:i]);
-      abs_diff ad_UH_f(org_pix[i+15:i+8],UH_f[  i+15:  i+8],diff_UH_f[i+7:i]);
+      abs_diff ad_UH_h(org_pix[i+15:i+8],UH_h[  i+ 7:  i  ], diff_UH_h[i+7:i]);
+      abs_diff ad_UH_i(org_pix[i+15:i+8],UH_h[  i+15:  i+8], diff_UH_i[i+7:i]);
+      abs_diff ad_UH_q(org_pix[i+15:i+8],UH_q[2*i+ 7:2*i  ], diff_UH_q[i+7:i]);
+      abs_diff ad_UH_r(org_pix[i+15:i+8],UH_q[2*i+15:2*i+8], diff_UH_r[i+7:i]);
+      abs_diff ad_UH_f(org_pix[i+15:i+8],UH_f[  i+15:  i+8] ,diff_UH_f[i+7:i]);
 
-      abs_diff ad_UQ_h(org_pix[i+15:i+8],UQ_h[  i+ 7:  i  ],diff_UQ_h[i+7:i]);
-      abs_diff ad_UQ_i(org_pix[i+15:i+8],UQ_h[  i+15:  i+8],diff_UQ_i[i+7:i]);
-      abs_diff ad_UQ_q(org_pix[i+15:i+8],UQ_q[2*i+ 7:2*i  ],diff_UQ_q[i+7:i]);
-      abs_diff ad_UQ_r(org_pix[i+15:i+8],UQ_q[2*i+15:2*i+8],diff_UQ_r[i+7:i]);
-      abs_diff ad_UQ_f(org_pix[i+15:i+8],UQ_f[  i+ 7:  i  ],diff_UQ_f[i+7:i]);
+      abs_diff ad_UQ_h(org_pix[i+15:i+8],UQ_h[  i+ 7:  i  ], diff_UQ_h[i+7:i]);
+      abs_diff ad_UQ_i(org_pix[i+15:i+8],UQ_h[  i+15:  i+8], diff_UQ_i[i+7:i]);
+      abs_diff ad_UQ_q(org_pix[i+15:i+8],UQ_q[  i+ 7:  i  ], diff_UQ_q[i+7:i]);
+      abs_diff ad_UQ_r(org_pix[i+15:i+8],UQ_r[  i+ 7:  i  ], diff_UQ_r[i+7:i]);
+      abs_diff ad_UQ_f(org_pix[i+15:i+8],UQ_f[  i+ 7:  i  ], diff_UQ_f[i+7:i]);
 
 
       abs_diff ad_M_h(org_pix[i+15:i+8], M_h[  i+ 7:  i  ], diff_M_h[i+7:i]);
@@ -186,17 +186,17 @@ module abs_diff_line(cur_upper_pix, cur_middle_pix, cur_lower_pix, org_pix,
       abs_diff ad_M_f(org_pix[i+15:i+8], M_f[  i+15:  i+8], diff_M_f[i+7:i]);
 
 
-      abs_diff ad_LQ_h(org_pix[i+15:i+8],LQ_h[  i+ 7:  i  ],diff_LQ_h[i+7:i]);
-      abs_diff ad_LQ_i(org_pix[i+15:i+8],LQ_h[  i+15:  i+8],diff_LQ_i[i+7:i]);
-      abs_diff ad_LQ_q(org_pix[i+15:i+8],LQ_q[2*i+ 7:2*i  ],diff_LQ_q[i+7:i]);
-      abs_diff ad_LQ_r(org_pix[i+15:i+8],LQ_q[2*i+15:2*i+8],diff_LQ_r[i+7:i]);
-      abs_diff ad_LQ_f(org_pix[i+15:i+8],LQ_f[  i+ 7:  i  ],diff_LQ_f[i+7:i]);
+      abs_diff ad_LQ_h(org_pix[i+15:i+8],LQ_h[  i+ 7:  i  ], diff_LQ_h[i+7:i]);
+      abs_diff ad_LQ_i(org_pix[i+15:i+8],LQ_h[  i+15:  i+8], diff_LQ_i[i+7:i]);
+      abs_diff ad_LQ_q(org_pix[i+15:i+8],LQ_q[  i+ 7:  i  ], diff_LQ_q[i+7:i]);
+      abs_diff ad_LQ_r(org_pix[i+15:i+8],LQ_r[  i+ 7:  i  ], diff_LQ_r[i+7:i]);
+      abs_diff ad_LQ_f(org_pix[i+15:i+8],LQ_f[  i+ 7:  i  ], diff_LQ_f[i+7:i]);
 
-      abs_diff ad_LH_h(org_pix[i+15:i+8],LH_h[  i+ 7:  i  ],diff_LH_h[i+7:i]);
-      abs_diff ad_LH_i(org_pix[i+15:i+8],LH_h[  i+15:  i+8],diff_LH_i[i+7:i]);
-      abs_diff ad_LH_q(org_pix[i+15:i+8],LH_q[2*i+ 7:2*i  ],diff_LH_q[i+7:i]);
-      abs_diff ad_LH_r(org_pix[i+15:i+8],LH_q[2*i+15:2*i+8],diff_LH_r[i+7:i]);
-      abs_diff ad_LH_f(org_pix[i+15:i+8],LH_f[  i+15:  i+8],diff_LH_f[i+7:i]);
+      abs_diff ad_LH_h(org_pix[i+15:i+8],LH_h[  i+ 7:  i  ], diff_LH_h[i+7:i]);
+      abs_diff ad_LH_i(org_pix[i+15:i+8],LH_h[  i+15:  i+8], diff_LH_i[i+7:i]);
+      abs_diff ad_LH_q(org_pix[i+15:i+8],LH_q[2*i+ 7:2*i  ], diff_LH_q[i+7:i]);
+      abs_diff ad_LH_r(org_pix[i+15:i+8],LH_q[2*i+15:2*i+8], diff_LH_r[i+7:i]);
+      abs_diff ad_LH_f(org_pix[i+15:i+8],LH_f[  i+15:  i+8], diff_LH_f[i+7:i]);
 
     end
   endgenerate
