@@ -64,13 +64,36 @@ module frac_search(cur_pix, org_pix, ready, sad_out, mvx, mvy, clk, reset);
   reg  [13:0]   sad_LQ[4:0];
   reg  [13:0]   sad_LH[4:0];
 
-  reg  [9:0]    sad_min[4:0];
-  reg  [2:0]    vec_min[4:0];
+  wire [69:0]   sad_UH_vec;
+  wire [69:0]   sad_UQ_vec;
+  wire [69:0]   sad_M_vec;
+  wire [69:0]   sad_LQ_vec;
+  wire [69:0]   sad_LH_vec;
+
+  wire [69:0]   smallest_sad_vec;
+  wire [13:0]   smallest_sad_ver;
+  wire [2:0]    idx_min[4:0];
+  wire [2:0]    idx_min_ver;    
 
   integer       i;
 
   compute_sad cs(cur_upper_pix, cur_middle_pix, cur_lower_pix, org_pix,
        line_sad_UH, line_sad_UQ, line_sad_M, line_sad_LQ, line_sad_LH);
+
+  assign sad_UH_vec = {sad_UH[4], sad_UH[3], sad_UH[2], sad_UH[1], sad_UH[0]};
+  assign sad_UQ_vec = {sad_UQ[4], sad_UQ[3], sad_UQ[2], sad_UQ[1], sad_UQ[0]};
+  assign sad_M_vec  = {sad_M[4] , sad_M[3] , sad_M[2] , sad_M[1] , sad_M[0] };
+  assign sad_LQ_vec = {sad_LQ[4], sad_LQ[3], sad_LQ[2], sad_LQ[1], sad_LQ[0]};
+  assign sad_LH_vec = {sad_LH[4], sad_LH[3], sad_LH[2], sad_LH[1], sad_LH[0]};
+
+
+  smallest_sad ss_UH(sad_UH_vec,smallest_sad_vec[13: 0],idx_min[0]);
+  smallest_sad ss_UQ(sad_UQ_vec,smallest_sad_vec[27:14],idx_min[1]);
+  smallest_sad ss_M (sad_M_vec ,smallest_sad_vec[41:28],idx_min[2]);
+  smallest_sad ss_LQ(sad_LQ_vec,smallest_sad_vec[55:42],idx_min[3]);
+  smallest_sad ss_LH(sad_LH_vec,smallest_sad_vec[69:56],idx_min[4]);
+
+  smallest_sad ss_VER(smallest_sad_vec,smallest_sad_ver,idx_min_ver);
 
   always @(posedge clk or posedge reset)
     if (reset == 1'b1) begin
@@ -98,22 +121,42 @@ module frac_search(cur_pix, org_pix, ready, sad_out, mvx, mvy, clk, reset);
             cur_lower_pix  = cur_pix;
             counter        = counter + 1;
             if(counter >= 2) begin
-              sad_M[4] = sad_M[4] + line_sad_M[59:48]; // FIXME: Implement the sum for all lines
-              sad_M[3] = sad_M[3] + line_sad_M[47:36];
-              sad_M[2] = sad_M[2] + line_sad_M[35:24];
-              sad_M[1] = sad_M[1] + line_sad_M[23:12];
-              sad_M[0] = sad_M[0] + line_sad_M[11: 0];
+              sad_UH[4] = sad_UH[4] + line_sad_UH[59:48];
+              sad_UH[3] = sad_UH[3] + line_sad_UH[47:36];
+              sad_UH[2] = sad_UH[2] + line_sad_UH[35:24];
+              sad_UH[1] = sad_UH[1] + line_sad_UH[23:12];
+              sad_UH[0] = sad_UH[0] + line_sad_UH[11: 0];
+
+              sad_UQ[4] = sad_UQ[4] + line_sad_UQ[59:48];
+              sad_UQ[3] = sad_UQ[3] + line_sad_UQ[47:36];
+              sad_UQ[2] = sad_UQ[2] + line_sad_UQ[35:24];
+              sad_UQ[1] = sad_UQ[1] + line_sad_UQ[23:12];
+              sad_UQ[0] = sad_UQ[0] + line_sad_UQ[11: 0];
+
+              sad_M[4]  = sad_M[4]  + line_sad_M[59:48];
+              sad_M[3]  = sad_M[3]  + line_sad_M[47:36];
+              sad_M[2]  = sad_M[2]  + line_sad_M[35:24];
+              sad_M[1]  = sad_M[1]  + line_sad_M[23:12];
+              sad_M[0]  = sad_M[0]  + line_sad_M[11: 0];
+
+              sad_LQ[4] = sad_LQ[4] + line_sad_LQ[59:48];
+              sad_LQ[3] = sad_LQ[3] + line_sad_LQ[47:36];
+              sad_LQ[2] = sad_LQ[2] + line_sad_LQ[35:24];
+              sad_LQ[1] = sad_LQ[1] + line_sad_LQ[23:12];
+              sad_LQ[0] = sad_LQ[0] + line_sad_LQ[11: 0];
+
+              sad_LH[4] = sad_LH[4] + line_sad_LH[59:48];
+              sad_LH[3] = sad_LH[3] + line_sad_LH[47:36];
+              sad_LH[2] = sad_LH[2] + line_sad_LH[35:24];
+              sad_LH[1] = sad_LH[1] + line_sad_LH[23:12];
+              sad_LH[0] = sad_LH[0] + line_sad_LH[11: 0];
             end
           end
         end
         RSLT: begin
-          counter        = 0;
-          if(sad_M[4]<sad_M[3]) begin
-            mvx <= 1; // FIXME: Implement the smallest selector
-          end
-          else begin
-            mvx <= 0;
-          end
+          counter = 0;
+          mvy     = idx_min_ver;
+          mvx     = idx_min[idx_min_ver];
         end
       endcase
   end
