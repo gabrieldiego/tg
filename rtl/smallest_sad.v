@@ -1,7 +1,7 @@
-module smallest_sad(sad_vec, smallest_sad, smallest_index);
+module smallest_sad(sad_vec, smallest_sad, smallest_idx);
   input  [69:0] sad_vec;
   output [13:0] smallest_sad;
-  output  [2:0] smallest_index;
+  output  [2:0] smallest_idx;
 
   wire   [13:0] smallest_sad_1;
   wire   [13:0] smallest_sad_2;
