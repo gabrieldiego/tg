@@ -149,6 +149,7 @@ Void TAppEncTop::xInitLibCfg()
   
   //====== Tool list ========
   m_cTEncTop.setDeltaQpRD                    ( m_uiDeltaQpRD  );
+  m_cTEncTop.setUse6x6Blocks                 ( m_b6x6Blocks   );
   m_cTEncTop.setUseASR                       ( m_bUseASR      );
   m_cTEncTop.setUseHADME                     ( m_bUseHADME    );
   m_cTEncTop.setdQPs                         ( m_aidQP        );

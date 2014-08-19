@@ -4577,20 +4577,17 @@ Void TEncSearch::xPatternSearchFracDIF_hw(TComDataCU* pcCU,
     exit(-1);
   }
 
-//#define NEW_METHOD
+  if(m_pcEncCfg->getUse6x6Blocks()) {
+    TComMv pred_mv(0,0);
+    UInt cost;
 
-
-#ifdef NEW_METHOD
-  TComMv pred_mv(0,0);
-  UInt cost;
-
-  cost = refine_mv(m_cDistParam.pOrg,
-                   m_filteredBlock[0][0].getLumaAddr(),
-                   m_cDistParam.iStrideOrg*(1<<m_cDistParam.iSubShift),
-                   m_filteredBlock[0][0].getStride(),
-                   pred_mv
-                  );
-#endif
+    cost = refine_mv(m_cDistParam.pOrg,
+                     m_filteredBlock[0][0].getLumaAddr(),
+                     m_cDistParam.iStrideOrg*(1<<m_cDistParam.iSubShift),
+                     m_filteredBlock[0][0].getStride(),
+                     pred_mv
+                    );
+  }
 
   ruiCost = xPatternRefinement_hw( pcPatternKey, baseRefMv, 2, rcMvHalf   );
   
@@ -4604,17 +4601,17 @@ Void TEncSearch::xPatternSearchFracDIF_hw(TComDataCU* pcCU,
   rcMvQter += rcMvHalf;  rcMvQter <<= 1;
   ruiCost = xPatternRefinement_hw( pcPatternKey, baseRefMv, 1, rcMvQter );
 
-#ifdef NEW_METHOD
-
+  if(m_pcEncCfg->getUse6x6Blocks()) {
 //  cout << "Mv original:" << setw(2) << rcMvQter.getHor() << setw(2) << rcMvQter.getVer() << endl;
 //  cout << "Mv new     :" << setw(2) << pred_mv.getHor() << setw(2) << pred_mv.getVer() << endl << endl;
 
-  rcMvHalf = TComMv(0,0);
-  rcMvQter = pred_mv;
-  ruiCost = cost;
-#endif
+    rcMvHalf = TComMv(0,0);
+    rcMvQter = pred_mv;
+    ruiCost = cost;
+
 //  cout << "Mv half  :" << setw(2) << rcMvHalf.getHor() << setw(2) << rcMvHalf.getVer() << endl;
 //  cout << "Mv chosen:" << setw(2) << rcMvQter.getHor() << setw(2) << rcMvQter.getVer() << endl;
+  }
 
 }
 

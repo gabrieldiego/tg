@@ -160,6 +160,7 @@ protected:
   Bool      m_bPCMFilterDisableFlag;                          ///< PCM filter disable flag
 
   // coding tools (encoder-only parameters)
+  Bool      m_b6x6Blocks;                                     ///< flag for using 6x6 blocks in 8x8 blocks for cost estimation for subpel motion prediction
   Bool      m_bUseASR;                                        ///< flag for using adaptive motion search range
   Bool      m_bUseHADME;                                      ///< flag for using HAD in sub-pel ME
   Bool      m_useRDOQ;                                       ///< flag for using RD optimized quantization

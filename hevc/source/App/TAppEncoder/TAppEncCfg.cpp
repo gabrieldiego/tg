@@ -321,6 +321,7 @@ Bool TAppEncCfg::parseCfg( Int argc, Char* argv[] )
   ("BipredSearchRange",       m_bipredSearchRange,          4, "Motion search range for bipred refinement")
   ("HadamardME",              m_bUseHADME,               true, "Hadamard ME for fractional-pel")
   ("ASR",                     m_bUseASR,                false, "Adaptive motion search range")
+  ("6x6Blocks",               m_b6x6Blocks,             false, "Enable use of 6x6 blocks for cost estimation in 8x8 blocks for subpel motion prediction")
 
   // Mode decision parameters
   ("LambdaModifier0,-LM0", m_adLambdaModifier[ 0 ], ( Double )1.0, "Lambda modifier for temporal layer 0")
@@ -1448,6 +1449,7 @@ Void TAppEncCfg::xPrintParameter()
   printf("RDpenalty:%d ", m_rdPenalty  );
   printf("SQP:%d ", m_uiDeltaQpRD         );
   printf("ASR:%d ", m_bUseASR             );
+  printf("6x6Blocks:%d ", m_b6x6Blocks    );
   printf("FEN:%d ", m_bUseFastEnc         );
   printf("ECU:%d ", m_bUseEarlyCU         );
   printf("FDM:%d ", m_useFastDecisionForMerge );
