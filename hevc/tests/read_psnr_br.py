@@ -106,9 +106,9 @@ def print_cfg(cfg_name, qps):
     print "%.2f dB" % p[1]
     nonepsnr.append(p[1])
 
-  pyplot.plot(oldbr,oldpsnr, label='original')
-  pyplot.plot(newbr,newpsnr, label='proposto')
-  pyplot.plot(nonebr,nonepsnr, label='full-pixel')
+  pyplot.plot(oldbr,oldpsnr, label='original', linestyle='solid')
+  pyplot.plot(newbr,newpsnr, label='proposto', linestyle='dashed')
+  pyplot.plot(nonebr,nonepsnr, label='full-pixel', linestyle='dotted')
 
   pyplot.title(cfg_name)
   pyplot.legend(loc=0)
