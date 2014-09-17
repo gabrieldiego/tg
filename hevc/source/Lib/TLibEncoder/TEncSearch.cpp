@@ -4088,9 +4088,12 @@ Void TEncSearch::xMotionEstimation( TComDataCU* pcCU, TComYuv* pcYuvOrg, Int iPa
   m_pcRdCost->getMotionCost( 1, 0 );
   m_pcRdCost->setCostScale ( 1 );
   
-//  xPatternSearchFracDIF( pcCU, pcPatternKey, piRefY, iRefStride, &rcMv, cMvHalf, cMvQter, ruiCost,bBi );
-  xPatternSearchFracDIF_hw( pcCU, pcPatternKey, piRefY, iRefStride, &rcMv, cMvHalf, cMvQter, ruiCost,bBi );
-  
+  if(m_pcEncCfg->getUse6x6Blocks()) {
+    xPatternSearchFracDIF_hw( pcCU, pcPatternKey, piRefY, iRefStride, &rcMv, cMvHalf, cMvQter, ruiCost, bBi );
+  } else {
+    xPatternSearchFracDIF( pcCU, pcPatternKey, piRefY, iRefStride, &rcMv, cMvHalf, cMvQter, ruiCost, bBi );
+  }
+
   m_pcRdCost->setCostScale( 0 );
   rcMv <<= 2;
   rcMv += (cMvHalf <<= 1);
@@ -4425,14 +4428,23 @@ Void vector_sad(UInt *res, Pel *vector, Pel pixel, Int len) {
   }
 }
 
+//#define PRINT_BLOCKS
+
 UInt refine_mv(Pel *Org, Pel *Cur, Int StrideOrg, Int StrideCur, TComMv& mv) {
   Int a,b;
+
   Int h=8,w=8;
   Pel UF[7],UH[7],UQ[7],M[7],LQ[7],LH[7],LF[7];
 
   UInt SadCost[25];
   UInt SmallestSad;
   UInt SmallestSadI;
+
+#ifdef PRINT_BLOCKS
+  int c,d;
+  Pel filtered_pixels[5][5][6][6];
+#endif /* PRINT_BLOCKS */
+
   // Lines: Upper Full, Upper Half, Upper Quarter, Middle, Lower Quarter, Lower Half, Lower Full
 
   // Follow the next diagram:
@@ -4510,13 +4522,37 @@ UInt refine_mv(Pel *Org, Pel *Cur, Int StrideOrg, Int StrideCur, TComMv& mv) {
       vector_sad(SadCost+10, M+1,OrgP,5);
       vector_sad(SadCost+15,LQ+1,OrgP,5);
       vector_sad(SadCost+20,LH+1,OrgP,5);
+
+#ifdef PRINT_BLOCKS
+      cout << hex << setw(3) << Cur[0];
+#endif /* PRINT_BLOCKS */
+
       Org++;
       Cur++;
+
+#ifdef PRINT_BLOCKS
+      for(c=0; c<5; c++) {
+        filtered_pixels[0][c][a-1][b-1] = UH[c+1];
+        filtered_pixels[1][c][a-1][b-1] = UQ[c+1];
+        filtered_pixels[2][c][a-1][b-1] =  M[c+1];
+        filtered_pixels[3][c][a-1][b-1] = LQ[c+1];
+        filtered_pixels[4][c][a-1][b-1] = LH[c+1];
+      }
+#endif /* PRINT_BLOCKS */
+
     }
+
+#ifdef PRINT_BLOCKS
+    cout << endl;
+#endif /* PRINT_BLOCKS */
 
     Org+=StrideOrg-7;
     Cur+=StrideCur-7;
   }
+
+#ifdef PRINT_BLOCKS
+  cout << endl;
+#endif /* PRINT_BLOCKS */
 
   SmallestSad = SadCost[0];
   SmallestSadI=0;
@@ -4532,6 +4568,35 @@ UInt refine_mv(Pel *Org, Pel *Cur, Int StrideOrg, Int StrideCur, TComMv& mv) {
   Int Ver = (SmallestSadI/5)-2;
 
   mv = TComMv(Hor,Ver);
+
+#ifdef PRINT_BLOCKS
+  cout << hex;
+
+  for(a=0; a<5; a++) {
+    for(c=0; c<6; c++) {
+      for(b=0; b<5; b++) {
+        for(d=0; d<6; d++) {
+          cout << setw(3) << filtered_pixels[a][b][c][d];
+        }
+        cout << "   ";
+      }
+      cout << endl;
+    }
+    cout << endl;
+  }
+  cout << endl;
+#endif /* PRINT_BLOCKS */
+
+#if 0
+  for(a=0; a<6; a++) {
+    for(b=0; b<6; b++) {
+      Cur[]
+    }
+  }
+#endif
+
+  cout << dec;
+
 
   return SmallestSad;
 }
@@ -4557,62 +4622,62 @@ Void TEncSearch::xPatternSearchFracDIF_hw(TComDataCU* pcCU,
                           pcPatternKey->getROIYHeight(),
                           iRefStride,
                           0, 0 );
-  
-  /* Print the contents of the CB */
-
-  /* Read the HW output results */
-
-  /* Compare to the SW results */
 
   //  Half-pel refinement
-  xExtDIFUpSamplingH ( &cPatternRoi, biPred );
+  // Not needed here, but some variables are being changed so that removing
+  // will affect the performance
+  Int width      = cPatternRoi.getROIYWidth();
+  Int height     = cPatternRoi.getROIYHeight();
+  Int srcStride  = cPatternRoi.getPatternLStride();
+
+  Int intStride = m_filteredBlockTmp[0].getStride();
+  Int dstStride = m_filteredBlock[0][0].getStride();
+  Short *intPtr;
+  Short *dstPtr;
+  Int filterSize = NTAPS_LUMA;
+  Int halfFilterSize = (filterSize>>1);
+  Pel *srcPtr = cPatternRoi.getROIY() - halfFilterSize*srcStride - 1;
+
+  m_if.filterHorLuma(srcPtr, srcStride, m_filteredBlockTmp[0].getLumaAddr(), intStride, width+1, height+filterSize, 0, false);
+  m_if.filterHorLuma(srcPtr, srcStride, m_filteredBlockTmp[2].getLumaAddr(), intStride, width+1, height+filterSize, 2, false);
+
+  intPtr = m_filteredBlockTmp[0].getLumaAddr() + halfFilterSize * intStride + 1;  
+  dstPtr = m_filteredBlock[0][0].getLumaAddr();
+  m_if.filterVerLuma(intPtr, intStride, dstPtr, dstStride, width+0, height+0, 0, false, true);
 
 //  DumpCUContents(&cPatternRoi);
 
-  rcMvHalf = *pcMvInt;   rcMvHalf <<= 1;    // for mv-cost
   TComMv baseRefMv(0, 0);
+  TComMv pred_mv(0,0);
+  UInt cost=0;
 
   if(pcPatternKey->getROIYWidth() != 8 || pcPatternKey->getROIYHeight() != 8) {
     cerr << "Invalid TU size" << endl;
     exit(-1);
   }
 
-  if(m_pcEncCfg->getUse6x6Blocks()) {
-    TComMv pred_mv(0,0);
-    UInt cost;
-
-    cost = refine_mv(m_cDistParam.pOrg,
-                     m_filteredBlock[0][0].getLumaAddr(),
-                     m_cDistParam.iStrideOrg*(1<<m_cDistParam.iSubShift),
-                     m_filteredBlock[0][0].getStride(),
-                     pred_mv
-                    );
-  }
+  cost = refine_mv(m_cDistParam.pOrg,
+                   m_filteredBlock[0][0].getLumaAddr(),
+                   m_cDistParam.iStrideOrg*(1<<m_cDistParam.iSubShift),
+                   m_filteredBlock[0][0].getStride(),
+                   pred_mv
+                  );
 
   ruiCost = xPatternRefinement_hw( pcPatternKey, baseRefMv, 2, rcMvHalf   );
-  
-  m_pcRdCost->setCostScale( 0 );
-  
-  xExtDIFUpSamplingQ ( &cPatternRoi, rcMvHalf, biPred );
-  baseRefMv = rcMvHalf;
-  baseRefMv <<= 1;
-  
-  rcMvQter = *pcMvInt;   rcMvQter <<= 1;    // for mv-cost
-  rcMvQter += rcMvHalf;  rcMvQter <<= 1;
-  ruiCost = xPatternRefinement_hw( pcPatternKey, baseRefMv, 1, rcMvQter );
 
-  if(m_pcEncCfg->getUse6x6Blocks()) {
-//  cout << "Mv original:" << setw(2) << rcMvQter.getHor() << setw(2) << rcMvQter.getVer() << endl;
-//  cout << "Mv new     :" << setw(2) << pred_mv.getHor() << setw(2) << pred_mv.getVer() << endl << endl;
+//    cout << "Mv new     :" << setw(2) << pred_mv.getHor() << setw(2) << pred_mv.getVer() << endl << endl;
 
-    rcMvHalf = TComMv(0,0);
-    rcMvQter = pred_mv;
-    ruiCost = cost;
+  rcMvHalf = TComMv(0,0);
+  rcMvQter = pred_mv;
+  ruiCost = (UInt) floor(cost*(1.77));
 
 //  cout << "Mv half  :" << setw(2) << rcMvHalf.getHor() << setw(2) << rcMvHalf.getVer() << endl;
 //  cout << "Mv chosen:" << setw(2) << rcMvQter.getHor() << setw(2) << rcMvQter.getVer() << endl;
-  }
 
+  // In case it is needed to perform only full pixel prediction
+//  rcMvHalf = TComMv(0,0);
+//  rcMvQter = TComMv(0,0);
+//  ruiCost = 0;
 }
 
 Void TEncSearch::xPatternSearchFracDIF(TComDataCU* pcCU,
