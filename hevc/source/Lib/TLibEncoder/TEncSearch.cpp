@@ -765,72 +765,6 @@ UInt TEncSearch::xPatternRefinement( TComPattern* pcPatternKey,
   return uiDistBest;
 }
 
-UInt TEncSearch::xPatternRefinement_hw( TComPattern* pcPatternKey,
-                                    TComMv baseRefMv,
-                                    Int iFrac, TComMv& rcMvFrac )
-{
-  UInt  uiDist;
-  UInt  uiDistBest  = MAX_UINT;
-  UInt  uiDirecBest = 0;
-
-  Pel*  piRefPos;
-  Int iRefStride = m_filteredBlock[0][0].getStride();
-  m_pcRdCost->setDistParam( pcPatternKey, m_filteredBlock[0][0].getLumaAddr(), iRefStride, 1, m_cDistParam, m_pcEncCfg->getUseHADME() );
-//  cout << "rcDistParam.iCols: " << m_cDistParam.iCols << endl;
-//  cout << "pcPatternKey->getROIYWidth()" << pcPatternKey->getROIYWidth() << endl;
-
-//  DumpCUContents(pcPatternKey);
-
-  const TComMv* pcMvRefine = (iFrac == 2 ? s_acMvRefineH : s_acMvRefineQ);
-
-  for (UInt i = 0; i < 9; i++)
-  {
-    TComMv cMvTest = pcMvRefine[i];
-    cMvTest += baseRefMv;
-
-    Int horVal = cMvTest.getHor() * iFrac;
-    Int verVal = cMvTest.getVer() * iFrac;
-    piRefPos = m_filteredBlock[ verVal & 3 ][ horVal & 3 ].getLumaAddr();
-    if ( horVal == 2 && ( verVal & 1 ) == 0 )
-    {
-      piRefPos += 1;
-    }
-    if ( ( horVal & 1 ) == 0 && verVal == 2 )
-    {
-      piRefPos += iRefStride;
-    }
-    cMvTest = pcMvRefine[i];
-    cMvTest += rcMvFrac;
-
-    setDistParamComp(0);  // Y component
-
-    m_cDistParam.pCur = piRefPos;
-    m_cDistParam.bitDepth = g_bitDepthY;
-
-//    cout << hex << (int)piRefPos << " " << piRefPos[0] << dec << endl;
-//    cout << horVal << "x" << verVal << endl;
-//    dump_ref_block(piRefPos,m_cDistParam.iCols,m_cDistParam.iRows,m_cDistParam.iStrideCur);
-
-//    UInt mvcost;
-
-    uiDist = m_cDistParam.DistFunc( &m_cDistParam );
-//    cout << "uiDist: " << uiDist << endl; 
-//    mvcost = uiDist;
-    uiDist += m_pcRdCost->getCost( cMvTest.getHor(), cMvTest.getVer() );
-//    cout << "mvcost: " << uiDist - mvcost << endl;
-
-    if ( uiDist < uiDistBest )
-    {
-      uiDistBest  = uiDist;
-      uiDirecBest = i;
-    }
-  }
-
-  rcMvFrac = pcMvRefine[uiDirecBest];
-
-  return uiDistBest;
-}
-
 Void
 TEncSearch::xEncSubdivCbfQT( TComDataCU*  pcCU,
                             UInt         uiTrDepth,
@@ -4639,7 +4573,6 @@ Void TEncSearch::xPatternSearchFracDIF_hw(TComDataCU* pcCU,
   Pel *srcPtr = cPatternRoi.getROIY() - halfFilterSize*srcStride - 1;
 
   m_if.filterHorLuma(srcPtr, srcStride, m_filteredBlockTmp[0].getLumaAddr(), intStride, width+1, height+filterSize, 0, false);
-  m_if.filterHorLuma(srcPtr, srcStride, m_filteredBlockTmp[2].getLumaAddr(), intStride, width+1, height+filterSize, 2, false);
 
   intPtr = m_filteredBlockTmp[0].getLumaAddr() + halfFilterSize * intStride + 1;  
   dstPtr = m_filteredBlock[0][0].getLumaAddr();
@@ -4662,10 +4595,6 @@ Void TEncSearch::xPatternSearchFracDIF_hw(TComDataCU* pcCU,
                    m_filteredBlock[0][0].getStride(),
                    pred_mv
                   );
-
-  ruiCost = xPatternRefinement_hw( pcPatternKey, baseRefMv, 2, rcMvHalf   );
-
-//    cout << "Mv new     :" << setw(2) << pred_mv.getHor() << setw(2) << pred_mv.getVer() << endl << endl;
 
   rcMvHalf = TComMv(0,0);
   rcMvQter = pred_mv;
