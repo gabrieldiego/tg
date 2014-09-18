@@ -12,7 +12,7 @@ module frac_search_tb;
 
   integer       cur_file;
   integer       org_file;
-  integer       i,c,tmp;
+  integer       i,j,c,tmp;
 
   reg           clk, reset;
 
@@ -58,37 +58,48 @@ module frac_search_tb;
     forever @(negedge clk) begin
       ready = 1;
 
-      for(i=0;i<8;i=i+1) begin
-        c = $fscanf(cur_file,"%x",tmp);
-        if(c != 1) begin
-          $finish;
+      for(j=0;j<=8;j=j+1) begin
+          if(j!=8) begin
+          // Skip the last read since it is to flush last row of org pixels
+          for(i=0;i<8;i=i+1) begin
+            c = $fscanf(cur_file,"%x",tmp);
+            if(c != 1) begin
+              $finish;
+            end
+            cur_array[i] = tmp;
+          end
         end
-        cur_array[i] = tmp;
-      end
 
-      cur_pix = {cur_array[7],cur_array[6],cur_array[5],cur_array[4],
-                 cur_array[3],cur_array[2],cur_array[1],cur_array[0]};
+        cur_pix = {cur_array[7],cur_array[6],cur_array[5],cur_array[4],
+                   cur_array[3],cur_array[2],cur_array[1],cur_array[0]};
 
-      for(i=0;i<8;i=i+1) begin
-        $write("%x ",cur_array[i]);
-      end
-      $write("\n\n");
-
-      for(i=0;i<8;i=i+1) begin
-        c = $fscanf(org_file,"%x",tmp);
-        if(c != 1) begin
-          $finish;
+        for(i=0;i<8;i=i+1) begin
+          $write("%x ",cur_array[i]);
         end
-        org_array[i] = tmp;
-      end
+        $write("\n\n");
 
-      org_pix = {org_array[6],org_array[5],org_array[4],
-                 org_array[3],org_array[2],org_array[1]};
+        if(j!=0) begin
+          // Read the first line only in the second cycle
+          for(i=0;i<8;i=i+1) begin
+            c = $fscanf(org_file,"%x",tmp);
+            if(c != 1) begin
+              $finish;
+            end
+            org_array[i] = tmp;
+          end
+        end
 
-      for(i=0;i<8;i=i+1) begin
-        $write("%x ",org_array[i]);
+        org_pix = {org_array[6],org_array[5],org_array[4],
+                   org_array[3],org_array[2],org_array[1]};
+
+        for(i=0;i<8;i=i+1) begin
+          $write("%x ",org_array[i]);
+        end
+        $write("\n\n");
+
+        if(j!=8)
+          @(negedge clk);
       end
-      $write("\n\n");
 
       #1 $write("%4d %d %d\n", sad_out, mvx, mvy);
     end
