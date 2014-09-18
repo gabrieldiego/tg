@@ -38,12 +38,11 @@ module frac_search(cur_pix, org_pix, ready, sad_out, mvx, mvy, clk, reset);
   //    X   |    X    |    X    |  RSLT |    0  --> mvx, mvy with results
   //    0   |    X    |    X    |  IDLE |    0
 
-  reg  [2:0]    mvx;
-  reg  [2:0]    mvy;
-
   reg  [63:0]   cur_upper_pix;
   reg  [63:0]   cur_middle_pix;
   reg  [63:0]   cur_lower_pix;
+  reg  [55:8]   org_pix_reg;
+  // It is important to register the inputs since they may be vary
 
   reg  [2:0]    counter;
 
@@ -83,7 +82,7 @@ module frac_search(cur_pix, org_pix, ready, sad_out, mvx, mvy, clk, reset);
 
   integer       i;
 
-  compute_sad cs(cur_upper_pix, cur_middle_pix, cur_lower_pix, org_pix,
+  compute_sad cs(cur_upper_pix, cur_middle_pix, cur_lower_pix, org_pix_reg,
        line_sad_UH, line_sad_UQ, line_sad_M, line_sad_LQ, line_sad_LH);
 
   assign sad_UH_vec = {sad_UH[4], sad_UH[3], sad_UH[2], sad_UH[1], sad_UH[0]};
@@ -99,6 +98,10 @@ module frac_search(cur_pix, org_pix, ready, sad_out, mvx, mvy, clk, reset);
   smallest_sad ss_LH(sad_LH_vec,smallest_sad_vec[69:56],idx_min[4]);
 
   smallest_sad ss_VER(smallest_sad_vec,smallest_sad_ver,idx_min_ver);
+
+  assign mvy     = idx_min_ver;
+  assign mvx     = idx_min[idx_min_ver];
+  assign sad_out = smallest_sad_ver;
 
   always @(posedge clk or posedge reset)
     if (reset == 1'b1) begin
@@ -124,6 +127,7 @@ module frac_search(cur_pix, org_pix, ready, sad_out, mvx, mvy, clk, reset);
             cur_upper_pix  = cur_middle_pix;
             cur_middle_pix = cur_lower_pix;
             cur_lower_pix  = cur_pix;
+            org_pix_reg    = org_pix;
             counter        = counter + 1;
 
             sad_UH[4] = next_sad_UH[4];
@@ -158,9 +162,11 @@ module frac_search(cur_pix, org_pix, ready, sad_out, mvx, mvy, clk, reset);
           end
         end
         RSLT: begin
+          cur_upper_pix  = cur_middle_pix;
+          cur_middle_pix = cur_lower_pix;
+          cur_lower_pix  = cur_pix;
+          org_pix_reg    = org_pix;
           counter = 0;
-          mvy     = idx_min_ver;
-          mvx     = idx_min[idx_min_ver];
         end
       endcase
   end
