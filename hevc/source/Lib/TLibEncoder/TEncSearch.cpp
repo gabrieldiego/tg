@@ -4596,12 +4596,20 @@ Void TEncSearch::xPatternSearchFracDIF_hw(TComDataCU* pcCU,
                    pred_mv
                   );
 
+#ifdef PRINT_BLOCKS
+  cout << "pixels_org" << endl;
+  dump_ref_block(m_cDistParam.pOrg,8,8,m_cDistParam.iStrideOrg*(1<<m_cDistParam.iSubShift));
+
+  cout << "pixels_cur" << endl;
+  dump_ref_block(m_filteredBlock[0][0].getLumaAddr(),8,8,m_filteredBlock[0][0].getStride());
+
+  cout << "mv" << endl;
+  cout << pred_mv.getHor() << " " << pred_mv.getVer() << endl << endl;
+#endif /* PRINT_BLOCKS */
+
   rcMvHalf = TComMv(0,0);
   rcMvQter = pred_mv;
   ruiCost = (UInt) floor(cost*(1.77));
-
-//  cout << "Mv half  :" << setw(2) << rcMvHalf.getHor() << setw(2) << rcMvHalf.getVer() << endl;
-//  cout << "Mv chosen:" << setw(2) << rcMvQter.getHor() << setw(2) << rcMvQter.getVer() << endl;
 
   // In case it is needed to perform only full pixel prediction
 //  rcMvHalf = TComMv(0,0);
