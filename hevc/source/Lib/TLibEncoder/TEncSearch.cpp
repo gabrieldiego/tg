@@ -4345,14 +4345,14 @@ void dump_ref_block(Pel *src, Int w, Int h, Int s) {
   cout << endl;
 }
 
-Void filter_line(Pel *Line, Pel *Org, Int Step) {
-  Line[0] =  Org[-Step];
-  Line[1] = (Org[-Step] +   Org[0]) >> 1;
-  Line[2] = (Org[-Step] + 3*Org[0]) >> 2;
-  Line[3] =  Org[0];
-  Line[4] = (Org[ Step] + 3*Org[0]   ) >>2;
-  Line[5] = (Org[0]     +   Org[Step]) >>1;
-  Line[6] =  Org[Step];
+Void filter_line(Pel *Line, Pel *Cur, Int Step) {
+  Line[0] =  Cur[-Step];
+  Line[1] = (Cur[-Step] +   Cur[0] + 1) >> 1;
+  Line[2] = (Cur[-Step] + 3*Cur[0] + 2) >> 2;
+  Line[3] =  Cur[0];
+  Line[4] = (Cur[ Step] + 3*Cur[0] + 2) >> 2;
+  Line[5] = (Cur[0]     +   Cur[Step]+1)>> 1;
+  Line[6] =  Cur[Step];
 }
 
 Void vector_sad(UInt *res, Pel *vector, Pel pixel, Int len) {
@@ -4362,7 +4362,7 @@ Void vector_sad(UInt *res, Pel *vector, Pel pixel, Int len) {
   }
 }
 
-//#define PRINT_BLOCKS
+#define PRINT_BLOCKS
 
 UInt refine_mv(Pel *Org, Pel *Cur, Int StrideOrg, Int StrideCur, TComMv& mv) {
   Int a,b;
@@ -4418,38 +4418,38 @@ UInt refine_mv(Pel *Org, Pel *Cur, Int StrideOrg, Int StrideCur, TComMv& mv) {
       filter_line(LF,Cur+StrideCur,1);
 
       // Upper Half
-      UH[0] = (UF[0] + M[0]) >> 1;
-      UH[1] = (UF[1] + M[1]) >> 1;
-      UH[3] = (UF[3] + M[3]) >> 1;
-      UH[5] = (UF[5] + M[5]) >> 1;
-      UH[6] = (UF[6] + M[6]) >> 1;
+      UH[0] = (UF[0] + M[0] + 1) >> 1;
+      UH[1] = (UF[1] + M[1] + 1) >> 1;
+      UH[3] = (UF[3] + M[3] + 1) >> 1;
+      UH[5] = (UF[5] + M[5] + 1) >> 1;
+      UH[6] = (UF[6] + M[6] + 1) >> 1;
 
-      UH[2] = (UH[0] + 3*UH[3]) >> 2;
-      UH[4] = (UH[6] + 3*UH[3]) >> 2;
+      UH[2] = (UH[0] + 3*UH[3] + 2) >> 2;
+      UH[4] = (UH[6] + 3*UH[3] + 2) >> 2;
 
       // Lower Half
-      LH[0] = (LF[0] + M[0]) >> 1;
-      LH[1] = (LF[1] + M[1]) >> 1;
-      LH[3] = (LF[3] + M[3]) >> 1;
-      LH[5] = (LF[5] + M[5]) >> 1;
-      LH[6] = (LF[6] + M[6]) >> 1;
+      LH[0] = (LF[0] + M[0] + 1) >> 1;
+      LH[1] = (LF[1] + M[1] + 1) >> 1;
+      LH[3] = (LF[3] + M[3] + 1) >> 1;
+      LH[5] = (LF[5] + M[5] + 1) >> 1;
+      LH[6] = (LF[6] + M[6] + 1) >> 1;
 
-      LH[2] = (LH[0] + 3*LH[3]) >> 2;
-      LH[4] = (LH[6] + 3*LH[3]) >> 2;
+      LH[2] = (LH[0] + 3*LH[3] + 2) >> 2;
+      LH[4] = (LH[6] + 3*LH[3] + 2) >> 2;
 
       // Upper Quarter
-      UQ[1] = (UF[1] + 3*M[1]) >> 2;
-      UQ[2] = (UF[2] + 3*M[2]) >> 2;
-      UQ[3] = (UF[3] + 3*M[3]) >> 2;
-      UQ[4] = (UF[4] + 3*M[4]) >> 2;
-      UQ[5] = (UF[5] + 3*M[5]) >> 2;
+      UQ[1] = (UF[1] + 3*M[1] + 2) >> 2;
+      UQ[2] = (UF[2] + 3*M[2] + 2) >> 2;
+      UQ[3] = (UF[3] + 3*M[3] + 2) >> 2;
+      UQ[4] = (UF[4] + 3*M[4] + 2) >> 2;
+      UQ[5] = (UF[5] + 3*M[5] + 2) >> 2;
 
       // Lower Quarter
-      LQ[1] = (LF[1] + 3*M[1]) >> 2;
-      LQ[2] = (LF[2] + 3*M[2]) >> 2;
-      LQ[3] = (LF[3] + 3*M[3]) >> 2;
-      LQ[4] = (LF[4] + 3*M[4]) >> 2;
-      LQ[5] = (LF[5] + 3*M[5]) >> 2;
+      LQ[1] = (LF[1] + 3*M[1] + 2) >> 2;
+      LQ[2] = (LF[2] + 3*M[2] + 2) >> 2;
+      LQ[3] = (LF[3] + 3*M[3] + 2) >> 2;
+      LQ[4] = (LF[4] + 3*M[4] + 2) >> 2;
+      LQ[5] = (LF[5] + 3*M[5] + 2) >> 2;
 
 #ifdef PRINT_BLOCKS
       for(c=0; c<5; c++) {
