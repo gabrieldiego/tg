@@ -4362,7 +4362,7 @@ Void vector_sad(UInt *res, Pel *vector, Pel pixel, Int len) {
   }
 }
 
-#define PRINT_BLOCKS
+//#define PRINT_BLOCKS
 
 UInt refine_mv(Pel *Org, Pel *Cur, Int StrideOrg, Int StrideCur, TComMv& mv) {
   Int a,b;
@@ -4372,7 +4372,8 @@ UInt refine_mv(Pel *Org, Pel *Cur, Int StrideOrg, Int StrideCur, TComMv& mv) {
 
   UInt SadCost[25];
   UInt SmallestSad;
-  UInt SmallestSadI;
+  UInt SmallestSadX;
+  UInt SmallestSadY;
 
 #ifdef PRINT_BLOCKS
   int c,d;
@@ -4488,27 +4489,32 @@ UInt refine_mv(Pel *Org, Pel *Cur, Int StrideOrg, Int StrideCur, TComMv& mv) {
 
 
   SmallestSad = SadCost[0];
-  SmallestSadI=0;
+  SmallestSadX=0;
+  SmallestSadY=0;
 
 #ifdef PRINT_BLOCKS
   cout << "sad" << endl;
   cout << hex;
 #endif /* PRINT_BLOCKS */
 
-  for(a=0;a<25;a++) {
+  for(a=0;a<5;a++) {
+    for(b=0;b<5;b++) {
+      Int SadIndex = a*5+b;
 #ifdef PRINT_BLOCKS
-    cout << setw(4) << SadCost[a];
-    if((a+1)%5==0)
-      cout << endl;
+      cout << setw(4) << SadCost[SadIndex];
+      if((a+1)==6)
+        cout << endl;
 #endif /* PRINT_BLOCKS */
-    if(SmallestSad > SadCost[a]) {
-      SmallestSad = SadCost[a];
-      SmallestSadI= a;
+      if(SmallestSad > SadCost[SadIndex]) {
+        SmallestSad = SadCost[SadIndex];
+        SmallestSadX= b;
+        SmallestSadY= a;
+      }
     }
   }
 
-  Int Hor = (SmallestSadI%5)-2;
-  Int Ver = (SmallestSadI/5)-2;
+  Int Hor = SmallestSadX-2;
+  Int Ver = SmallestSadY-2;
 
 #ifdef PRINT_BLOCKS
   cout << "smallest_sad " << endl << SmallestSad << endl;
