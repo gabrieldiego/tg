@@ -133,8 +133,8 @@ module abs_diff_line(cur_upper_pix, cur_middle_pix, cur_lower_pix, org_pix,
 
   generate
     for(i=0;i<48;i=i+8) begin: UQ_LQ_f_gen
-      assign UQ_f[i+7:i]=(cur_upper_pix[i+15:i+8]+cur_middle_pix[i+15:i]+8)/2;
-      assign LQ_f[i+7:i]=(cur_lower_pix[i+15:i+8]+cur_middle_pix[i+15:i+8])/2;
+      assign UQ_f[i+7:i]=(cur_upper_pix[i+15:i+8]+3*cur_middle_pix[i+15:i+8])/4;
+      assign LQ_f[i+7:i]=(cur_lower_pix[i+15:i+8]+3*cur_middle_pix[i+15:i+8])/4;
     end
   endgenerate
 
