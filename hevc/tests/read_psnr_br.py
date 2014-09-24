@@ -2,7 +2,10 @@
 
 import matplotlib.pyplot as pyplot
 
-cfg_names = ["basketballdrill", "basketballpass", "traffic",  "foreman"]
+#cfg_names = ["traffic", "kimono", "basketballdrill", "basketballpass", "foreman"]
+cfg_names = ["foreman"]
+
+print_table = 0
 
 qps = [22, 27, 32, 37]
 
@@ -78,46 +81,67 @@ def print_cfg(cfg_name, qps):
     old_param.append(read_cfg(summary_old))
     none_param.append(read_cfg(summary_none))
 
-#print new_param
-#print old_param
-#print none_param
+  if(print_table == 1):
 
-  print "new"
-  for p in new_param:
-    print "%.2f kbps" % p[0]
-    newbr.append(p[0])
-  for p in new_param:
-    print "%.2f dB" % p[1]
-    newpsnr.append(p[1])
+    print "new"
+    for p in new_param:
+      print "%.2f kbps" % p[0]
+      newbr.append(p[0])
+    for p in new_param:
+      print "%.2f dB" % p[1]
+      newpsnr.append(p[1])
 
-  print "old"
-  for p in old_param:
-    print "%.2f kbps" % p[0]
-    oldbr.append(p[0])
-  for p in old_param:
-    print "%.2f dB" % p[1]
-    oldpsnr.append(p[1])
+    print "old"
+    for p in old_param:
+      print "%.2f kbps" % p[0]
+      oldbr.append(p[0])
+    for p in old_param:
+      print "%.2f dB" % p[1]
+      oldpsnr.append(p[1])
 
-  print "none"
-  for p in none_param:
-    print "%.2f kbps" % p[0]
-    nonebr.append(p[0])
-  for p in none_param:
-    print "%.2f dB" % p[1]
-    nonepsnr.append(p[1])
+    print "none"
+    for p in none_param:
+      print "%.2f kbps" % p[0]
+      nonebr.append(p[0])
+    for p in none_param:
+      print "%.2f dB" % p[1]
+      nonepsnr.append(p[1])
 
-  pyplot.plot(oldbr,oldpsnr, label='original', linestyle='solid')
-  pyplot.plot(newbr,newpsnr, label='proposto', linestyle='dashed')
-  pyplot.plot(nonebr,nonepsnr, label='full-pixel', linestyle='dotted')
+    pyplot.plot(oldbr,oldpsnr, label='original', linestyle='solid')
+    pyplot.plot(newbr,newpsnr, label='proposto', linestyle='dashed')
+    pyplot.plot(nonebr,nonepsnr, label='full-pixel', linestyle='dotted')
 
-  pyplot.title(cfg_name)
-  pyplot.legend(loc=0)
-  pyplot.xlabel('bitrate (kbps)')
-  pyplot.ylabel('PSNR (dB)')
+    pyplot.title(cfg_name)
+    pyplot.legend(loc=0)
+    pyplot.xlabel('bitrate (kbps)')
+    pyplot.ylabel('PSNR (dB)')
 
-  pyplot.savefig(cfg_name + '.png')
-  pyplot.clf()
-  print "Finished"
+    pyplot.savefig(cfg_name + '.png')
+    pyplot.clf()
+    print "Finished"
+
+  else:
+    for p in new_param:
+      print "%.2f " % p[1],
+    print ""
+    for p in new_param:
+      print "%.2f " % p[0],
+    print ""
+
+    for p in old_param:
+      print "%.2f " % p[1],
+    print ""
+    for p in old_param:
+      print "%.2f " % p[0],
+    print ""
+
+    for p in none_param:
+      print "%.2f " % p[1],
+    print ""
+    for p in none_param:
+      print "%.2f " % p[0],
+    print ""
+
 
 for cfg_name in cfg_names:
   print cfg_name
