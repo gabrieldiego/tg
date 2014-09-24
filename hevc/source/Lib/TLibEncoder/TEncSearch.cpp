@@ -4451,19 +4451,6 @@ UInt refine_mv(Pel *Org, Pel *Cur, Int StrideOrg, Int StrideCur, TComMv& mv) {
       LQ[4] = (LF[4] + 3*M[4]) >> 2;
       LQ[5] = (LF[5] + 3*M[5]) >> 2;
 
-      vector_sad(SadCost   ,UF+1,OrgP,5);
-      vector_sad(SadCost+ 5,UQ+1,OrgP,5);
-      vector_sad(SadCost+10, M+1,OrgP,5);
-      vector_sad(SadCost+15,LQ+1,OrgP,5);
-      vector_sad(SadCost+20,LH+1,OrgP,5);
-
-#ifdef PRINT_BLOCKS
-      cout << hex << setw(3) << Cur[0];
-#endif /* PRINT_BLOCKS */
-
-      Org++;
-      Cur++;
-
 #ifdef PRINT_BLOCKS
       for(c=0; c<5; c++) {
         filtered_pixels[0][c][a-1][b-1] = UH[c+1];
@@ -4474,9 +4461,24 @@ UInt refine_mv(Pel *Org, Pel *Cur, Int StrideOrg, Int StrideCur, TComMv& mv) {
       }
 #endif /* PRINT_BLOCKS */
 
+      vector_sad(SadCost   ,UH+1,OrgP,5);
+      vector_sad(SadCost+ 5,UQ+1,OrgP,5);
+      vector_sad(SadCost+10, M+1,OrgP,5);
+      vector_sad(SadCost+15,LQ+1,OrgP,5);
+      vector_sad(SadCost+20,LH+1,OrgP,5);
+
+      Org++;
+      Cur++;
+
     }
 
 #ifdef PRINT_BLOCKS
+    cout << "line sad" << endl;
+    for(c=0; c<25; c++) {
+      cout << hex << setw(3) << SadCost[c];
+      if((c+1)%5==0)
+        cout << endl;
+    }
     cout << endl;
 #endif /* PRINT_BLOCKS */
 
@@ -4484,14 +4486,21 @@ UInt refine_mv(Pel *Org, Pel *Cur, Int StrideOrg, Int StrideCur, TComMv& mv) {
     Cur+=StrideCur-7;
   }
 
-#ifdef PRINT_BLOCKS
-  cout << endl;
-#endif /* PRINT_BLOCKS */
 
   SmallestSad = SadCost[0];
   SmallestSadI=0;
 
+#ifdef PRINT_BLOCKS
+  cout << "sad" << endl;
+  cout << hex;
+#endif /* PRINT_BLOCKS */
+
   for(a=0;a<25;a++) {
+#ifdef PRINT_BLOCKS
+    cout << setw(4) << SadCost[a];
+    if((a+1)%5==0)
+      cout << endl;
+#endif /* PRINT_BLOCKS */
     if(SmallestSad > SadCost[a]) {
       SmallestSad = SadCost[a];
       SmallestSadI= a;
@@ -4501,9 +4510,15 @@ UInt refine_mv(Pel *Org, Pel *Cur, Int StrideOrg, Int StrideCur, TComMv& mv) {
   Int Hor = (SmallestSadI%5)-2;
   Int Ver = (SmallestSadI/5)-2;
 
+#ifdef PRINT_BLOCKS
+  cout << "smallest_sad " << endl << SmallestSad << endl;
+#endif /* PRINT_BLOCKS */
+
   mv = TComMv(Hor,Ver);
 
 #ifdef PRINT_BLOCKS
+
+  cout << "frac_blocks" << endl;
   cout << hex;
 
   for(a=0; a<5; a++) {
@@ -4518,7 +4533,6 @@ UInt refine_mv(Pel *Org, Pel *Cur, Int StrideOrg, Int StrideCur, TComMv& mv) {
     }
     cout << endl;
   }
-  cout << endl;
 #endif /* PRINT_BLOCKS */
 
 #if 0
