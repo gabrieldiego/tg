@@ -99,8 +99,8 @@ module abs_diff_line(cur_upper_pix, cur_middle_pix, cur_lower_pix, org_pix,
   genvar          i;
   generate
     for(i=0; i<64; i=i+8) begin: UH_LH_f_gen
-      assign UH_f[i+7:i] = (cur_upper_pix[i+7:i] + cur_middle_pix[i+7:i]) / 2;
-      assign LH_f[i+7:i] = (cur_lower_pix[i+7:i] + cur_middle_pix[i+7:i]) / 2;
+      assign UH_f[i+7:i] = (cur_upper_pix[i+7:i] + cur_middle_pix[i+7:i]+1)/2;
+      assign LH_f[i+7:i] = (cur_lower_pix[i+7:i] + cur_middle_pix[i+7:i]+1)/2;
     end
   endgenerate
 
@@ -109,8 +109,8 @@ module abs_diff_line(cur_upper_pix, cur_middle_pix, cur_lower_pix, org_pix,
 
   generate
     for(i=0;i<56;i=i+8) begin: UH_LH_h_gen
-      assign UH_h[i+7:i] = (UF_h[i+7:i] + M_h[i+7:i]) / 2;
-      assign LH_h[i+7:i] = (LF_h[i+7:i] + M_h[i+7:i]) / 2;
+      assign UH_h[i+7:i] = (UF_h[i+7:i] + M_h[i+7:i] + 1) / 2;
+      assign LH_h[i+7:i] = (LF_h[i+7:i] + M_h[i+7:i] + 1) / 2;
     end
   endgenerate
 
@@ -119,11 +119,11 @@ module abs_diff_line(cur_upper_pix, cur_middle_pix, cur_lower_pix, org_pix,
 
   generate
     for(i=0;i<48;i=i+8) begin: UH_LH_q_gen
-      assign UH_q[2*i+ 7:2*i  ] = (UH_f[i+ 7:i   ] + 3*UH_f[i+15:i+8]) / 4;
-      assign UH_q[2*i+15:2*i+8] = (UH_f[i+23:i+16] + 3*UH_f[i+15:i+8]) / 4;
+      assign UH_q[2*i+ 7:2*i  ] = (UH_f[i+ 7:i   ] + 3*UH_f[i+15:i+8] + 2) / 4;
+      assign UH_q[2*i+15:2*i+8] = (UH_f[i+23:i+16] + 3*UH_f[i+15:i+8] + 2) / 4;
 
-      assign LH_q[2*i+ 7:2*i  ] = (LH_f[i+ 7:i   ] + 3*LH_f[i+15:i+8]) / 4;
-      assign LH_q[2*i+15:2*i+8] = (LH_f[i+23:i+16] + 3*LH_f[i+15:i+8]) / 4;
+      assign LH_q[2*i+ 7:2*i  ] = (LH_f[i+ 7:i   ] + 3*LH_f[i+15:i+8] + 2) / 4;
+      assign LH_q[2*i+15:2*i+8] = (LH_f[i+23:i+16] + 3*LH_f[i+15:i+8] + 2) / 4;
     end
   endgenerate
 
@@ -133,8 +133,8 @@ module abs_diff_line(cur_upper_pix, cur_middle_pix, cur_lower_pix, org_pix,
 
   generate
     for(i=0;i<48;i=i+8) begin: UQ_LQ_f_gen
-      assign UQ_f[i+7:i]=(cur_upper_pix[i+15:i+8]+3*cur_middle_pix[i+15:i+8])/4;
-      assign LQ_f[i+7:i]=(cur_lower_pix[i+15:i+8]+3*cur_middle_pix[i+15:i+8])/4;
+      assign UQ_f[i+7:i]=(cur_upper_pix[i+15:i+8]+3*cur_middle_pix[i+15:i+8]+2)/4;
+      assign LQ_f[i+7:i]=(cur_lower_pix[i+15:i+8]+3*cur_middle_pix[i+15:i+8]+2)/4;
     end
   endgenerate
 
@@ -143,8 +143,8 @@ module abs_diff_line(cur_upper_pix, cur_middle_pix, cur_lower_pix, org_pix,
 
   generate
     for(i=0;i<56;i=i+8) begin: UQ_LQ_h_gen
-      assign UQ_h[i+7:i] = (UF_h[i+7:i] + 3*M_h[i+7:i]) / 4;
-      assign LQ_h[i+7:i] = (LF_h[i+7:i] + 3*M_h[i+7:i]) / 4;
+      assign UQ_h[i+7:i] = (UF_h[i+7:i] + 3*M_h[i+7:i] + 2) / 4;
+      assign LQ_h[i+7:i] = (LF_h[i+7:i] + 3*M_h[i+7:i] + 2) / 4;
     end
   endgenerate
 
@@ -156,11 +156,11 @@ module abs_diff_line(cur_upper_pix, cur_middle_pix, cur_lower_pix, org_pix,
 
   generate
     for(i=0;i<48;i=i+8) begin: UQ_LQ_q_gen
-      assign UQ_q[i+7:i] = (UF_q[2*i+ 7:2*i  ] + 3*M_q[2*i+7:2*i]) / 4;
-      assign UQ_r[i+7:i] = (UF_q[2*i+15:2*i+8] + 3*M_q[2*i+7:2*i]) / 4;
+      assign UQ_q[i+7:i] = (UF_q[2*i+ 7:2*i  ] + 3*M_q[2*i+7:2*i] + 2) / 4;
+      assign UQ_r[i+7:i] = (UF_q[2*i+15:2*i+8] + 3*M_q[2*i+7:2*i] + 2) / 4;
 
-      assign LQ_q[i+7:i] = (LF_q[2*i+ 7:2*i  ] + 3*M_q[2*i+7:2*i]) / 4;
-      assign LQ_r[i+7:i] = (LF_q[2*i+15:2*i+8] + 3*M_q[2*i+7:2*i]) / 4;
+      assign LQ_q[i+7:i] = (LF_q[2*i+ 7:2*i  ] + 3*M_q[2*i+7:2*i] + 2) / 4;
+      assign LQ_r[i+7:i] = (LF_q[2*i+15:2*i+8] + 3*M_q[2*i+7:2*i] + 2) / 4;
     end
   endgenerate
 
